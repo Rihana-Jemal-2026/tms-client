@@ -29,12 +29,11 @@ export const EnrollmentStore = signalStore(
       () => store.entities().filter((e) => e.status === "Pending").length,
     ),
   })),
-  withMethods(
-    (
-      store,
-      api = inject(EnrollmentService),
-      sync = inject(LiveSyncService),
-    ) => ({
+  withMethods((store) => {
+    const api = inject(EnrollmentService);
+    const sync = inject(LiveSyncService);
+
+    return {
       // Listens to SignalR live sync stream and updates store state automatically
       listenForLiveUpdates: rxMethod<void>(
         pipe(
@@ -96,6 +95,6 @@ export const EnrollmentStore = signalStore(
           ),
         ),
       ),
-    }),
-  ),
+    };
+  }),
 );
