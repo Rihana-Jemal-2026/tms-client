@@ -12,8 +12,9 @@ import {
   updateEntity,
 } from "@ngrx/signals/entities";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { pipe, concatMap, tap, catchError, EMPTY } from "rxjs";
+import { pipe, concatMap, switchMap, tap, catchError, EMPTY } from "rxjs";
 import { EnrollmentService } from "../services/enrollment.service";
+import { LiveSyncService } from "../services/live-sync.service";
 import { Enrollment } from "../models/enrollment.model";
 
 export const EnrollmentStore = signalStore(
@@ -28,54 +29,73 @@ export const EnrollmentStore = signalStore(
       () => store.entities().filter((e) => e.status === "Pending").length,
     ),
   })),
-  withMethods((store, api = inject(EnrollmentService)) => ({
-    // Loading Data
-    loadEnrollments: rxMethod<void>(
-      pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
-        concatMap(() =>
-          api.getAll().pipe(
-            tap((rows) =>
-              patchState(store, setAllEntities(rows), { isLoading: false }),
+  withMethods(
+    (
+      store,
+      api = inject(EnrollmentService),
+      sync = inject(LiveSyncService),
+    ) => ({
+      // Listens to SignalR live sync stream and updates store state automatically
+      listenForLiveUpdates: rxMethod<void>(
+        pipe(
+          tap(() => sync.connect()),
+          switchMap(() => sync.events$),
+          tap((event) => {
+            patchState(
+              store,
+              updateEntity({ id: event.id, changes: { status: event.status } }),
+            );
+          }),
+        ),
+      ),
+      // Loading Data
+      loadEnrollments: rxMethod<void>(
+        pipe(
+          tap(() => patchState(store, { isLoading: true, error: null })),
+          concatMap(() =>
+            api.getAll().pipe(
+              tap((rows) =>
+                patchState(store, setAllEntities(rows), { isLoading: false }),
+              ),
+              catchError((err) => {
+                patchState(store, {
+                  isLoading: false,
+                  error: err.message || "Error loading enrollments",
+                });
+                return EMPTY;
+              }),
             ),
-            catchError((err) => {
-              patchState(store, {
-                isLoading: false,
-                error: err.message || "Error loading enrollments",
-              });
-              return EMPTY;
-            }),
           ),
         ),
       ),
-    ),
-    // Optimistic Approve
-    approveEnrollment: rxMethod<string>(
-      pipe(
-        tap((id) => {
-          // Optimistic update — the UI reacts before the network round-trip completes
-          patchState(
-            store,
-            updateEntity({ id, changes: { status: "Approved" } }),
-          );
-        }),
-        concatMap((id) =>
-          api.approve(id).pipe(
-            catchError((err) => {
-              // Server rejected — restore previous status & show error
-              patchState(
-                store,
-                updateEntity({ id, changes: { status: "Pending" } }),
-              );
-              patchState(store, {
-                error:
-                  "Server rejected the approval. Check enrollment constraints.",
-              });
-              return EMPTY;
-            }),
+      // Optimistic Approve
+      approveEnrollment: rxMethod<string>(
+        pipe(
+          tap((id) => {
+            // Optimistic update — the UI reacts before the network round-trip completes
+            patchState(
+              store,
+              updateEntity({ id, changes: { status: "Approved" } }),
+            );
+          }),
+          concatMap((id) =>
+            api.approve(id).pipe(
+              catchError((err) => {
+                // Server rejected — restore previous status & show error
+                patchState(
+                  store,
+                  updateEntity({ id, changes: { status: "Pending" } }),
+                );
+                patchState(store, {
+                  error:
+                    "Server rejected the approval. Check enrollment constraints.",
+                });
+                return EMPTY;
+              }),
+            ),
           ),
         ),
       ),
-    ),
-  })),
+    }),
+  ),
 );

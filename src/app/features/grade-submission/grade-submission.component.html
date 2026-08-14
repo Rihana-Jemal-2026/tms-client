@@ -1,0 +1,67 @@
+<div class="grade-submission-wrapper">
+  <mat-card class="grade-card shadow-2xl">
+    <mat-card-header class="card-header">
+      <div class="header-icon">
+        <mat-icon>school</mat-icon>
+      </div>
+      <div>
+        <mat-card-title class="title">Grade Submission Form</mat-card-title>
+        <mat-card-subtitle class="subtitle">Instructor Midterm Grading</mat-card-subtitle>
+      </div>
+    </mat-card-header>
+
+    <form [formGroup]="gradeForm" (ngSubmit)="onSubmit()">
+      <mat-card-content class="card-content">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Student ID</mat-label>
+          <input matInput type="number" formControlName="studentId" placeholder="e.g. 101" />
+          @if (gradeForm.controls.studentId.hasError('required')) {
+            <mat-error>Student ID is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Course ID</mat-label>
+          <input matInput type="number" formControlName="courseId" placeholder="e.g. 302" />
+          @if (gradeForm.controls.courseId.hasError('required')) {
+            <mat-error>Course ID is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Score (0-100)</mat-label>
+          <input matInput type="number" formControlName="score" placeholder="0 - 100" />
+          @if (gradeForm.controls.score.hasError('min') || gradeForm.controls.score.hasError('max')) {
+            <mat-error>Score must be between 0 and 100</mat-error>
+          }
+        </mat-form-field>
+
+        @if (isSubmitting) {
+          <div class="spinner-container">
+            <mat-spinner diameter="36"></mat-spinner>
+            <span>Guarding stream with exhaustMap...</span>
+          </div>
+        }
+
+        @if (submissionStatus) {
+          <div class="status-banner" [class.success]="isSuccess">
+            <mat-icon>{{ isSuccess ? 'check_circle' : 'info' }}</mat-icon>
+            <span>{{ submissionStatus }}</span>
+          </div>
+        }
+      </mat-card-content>
+
+      <mat-card-actions class="card-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="gradeForm.invalid || isSubmitting"
+          class="submit-btn"
+        >
+          Submit Final Grade
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+</div>
