@@ -42,7 +42,10 @@ export const EnrollmentStore = signalStore(
           tap((event) => {
             patchState(
               store,
-              updateEntity({ id: event.id, changes: { status: event.status } }),
+              updateEntity<Enrollment>({
+                id: event.id,
+                changes: { status: event.status },
+              }),
             );
           }),
         ),
@@ -53,13 +56,13 @@ export const EnrollmentStore = signalStore(
           tap(() => patchState(store, { isLoading: true, error: null })),
           concatMap(() =>
             api.getAll().pipe(
-              tap((rows) =>
+              tap((rows: Enrollment[]) =>
                 patchState(store, setAllEntities(rows), { isLoading: false }),
               ),
-              catchError((err) => {
+              catchError((err: any) => {
                 patchState(store, {
                   isLoading: false,
-                  error: err.message || "Error loading enrollments",
+                  error: err?.message || "Error loading enrollments",
                 });
                 return EMPTY;
               }),
@@ -70,20 +73,20 @@ export const EnrollmentStore = signalStore(
       // Optimistic Approve
       approveEnrollment: rxMethod<string>(
         pipe(
-          tap((id) => {
+          tap((id: string) => {
             // Optimistic update — the UI reacts before the network round-trip completes
             patchState(
               store,
-              updateEntity({ id, changes: { status: "Approved" } }),
+              updateEntity<Enrollment>({ id, changes: { status: "Approved" } }),
             );
           }),
-          concatMap((id) =>
+          concatMap((id: string) =>
             api.approve(id).pipe(
-              catchError((err) => {
+              catchError((err: any) => {
                 // Server rejected — restore previous status & show error
                 patchState(
                   store,
-                  updateEntity({ id, changes: { status: "Pending" } }),
+                  updateEntity<Enrollment>({ id, changes: { status: "Pending" } }),
                 );
                 patchState(store, {
                   error:

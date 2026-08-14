@@ -1,25 +1,42 @@
 <div class="dashboard">
-  <h1>Welcome, {{ studentName() }}</h1>
-  <p>Credits Earned: {{ earnedCredits() }}</p>
-  <p>Graduation Status: {{ graduationStatus() }}</p>
-  <p>Pending Enrollments (Store): <strong>{{ enrollmentStore.pendingCount() }}</strong></p>
-  <div class="actions">
-    <button (click)="registerForClass()">
-      Register for a Class (+3 credits)
-    </button>
-    <a routerLink="/enroll" class="btn-enroll">Enrollment Form</a>
-    <a routerLink="/enrollments" class="btn-enroll">Instructor Queue</a>
-    <a routerLink="/instructor" class="btn-enroll">Command Center</a>
-    <a routerLink="/grade-submission" class="btn-enroll">Grade Submission (exhaustMap)</a>
+  <div class="header-banner">
+    <div>
+      <h1>Welcome back, {{ studentName() }} 👋</h1>
+      <p class="subtitle">Managing course enrollments, real-time sync, and academic progress.</p>
+    </div>
   </div>
 
-  <h2>Course Catalog</h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="label">Credits Earned</div>
+      <div class="value purple">{{ earnedCredits() }} CR</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Graduation Status</div>
+      <div class="value emerald">{{ graduationStatus() }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Pending Queue</div>
+      <div class="value cyan">{{ enrollmentStore.pendingCount() }} Active</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button (click)="registerForClass()">
+      ⚡ Quick Register (+3 credits)
+    </button>
+    <a routerLink="/enroll" class="btn-enroll btn-secondary">Enrollment Form</a>
+    <a routerLink="/enrollments" class="btn-enroll btn-secondary">Instructor Queue</a>
+    <a routerLink="/instructor" class="btn-enroll btn-secondary">Command Center</a>
+    <a routerLink="/grade-submission" class="btn-enroll btn-secondary">Grade Submission (exhaustMap)</a>
+  </div>
+
+  <h2>Available Course Catalog</h2>
 
   @if (coursesResource.isLoading()) {
-    <div class="spinner">Fetching courses from the server...</div>
-  } @else if (coursesResource.error()) {
-    <div class="error">
-      Could not load courses. Make sure your .NET API is running.
+    <div class="spinner-box">
+      <div class="pulse-loader"></div>
+      <p>Fetching active course catalog...</p>
     </div>
   } @else {
     <div class="grid">
@@ -29,14 +46,14 @@
           (enrollClicked)="handleEnroll($event)"
         />
       } @empty {
-        <p>No courses are available this term.</p>
+        <p class="empty-state">No courses are available this term.</p>
       }
     </div>
   }
 
   @if (selectedCourse(); as picked) {
-    <p class="selection-hint" role="status">
-      Last enrollment request: <strong>{{ picked.title }}</strong> ({{ picked.code }})
-    </p>
+    <div class="selection-hint" role="status">
+      🚀 Last enrollment request queued: <strong>{{ picked.title }}</strong> ({{ picked.code }})
+    </div>
   }
 </div>
