@@ -1,0 +1,39 @@
+.dashboard-header {
+  padding: 1rem 0;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0.5rem 0 0 0;
+    font-size: 1.1rem;
+    color: #475569;
+  }
+}
+
+.chart-section {
+  margin-top: 2rem;
+
+  .skeleton-chart {
+    padding: 2rem;
+    background: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    text-align: center;
+    color: #64748b;
+  }
+
+  .spinner {
+    padding: 2rem;
+    background: #eff6ff;
+    border-radius: 8px;
+    text-align: center;
+    color: #1d4ed8;
+    font-weight: 500;
+  }
+}
