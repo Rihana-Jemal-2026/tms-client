@@ -4,6 +4,7 @@ import { RouterLink } from "@angular/router";
 import { CourseCardComponent } from "../../ui/course-card/course-card";
 import { Course } from "../../models/course.model";
 import { CourseService } from "../../services/course.service";
+import { EnrollmentStore } from "../../store/enrollment.store";
 
 @Component({
   selector: "app-student-dashboard",
@@ -14,6 +15,7 @@ import { CourseService } from "../../services/course.service";
 })
 export class StudentDashboardComponent {
   private api = inject(CourseService);
+  enrollmentStore = inject(EnrollmentStore);
 
   studentName = signal("Liya Kebede");
   earnedCredits = signal(45);
