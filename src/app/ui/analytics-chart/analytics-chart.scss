@@ -1,37 +1,47 @@
 .analytics-chart-box {
-  padding: 1.5rem;
-  background: #f8fafc;
-  border: 2px dashed #94a3b8;
-  border-radius: 8px;
-  margin-top: 1rem;
+  padding: 1.75rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  margin-top: 1.5rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
 
   h3 {
     margin-top: 0;
-    color: #334155;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #0f172a;
   }
 
   .bars {
     display: flex;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
 
     .bar {
-      padding: 1rem;
-      border-radius: 4px;
+      padding: 1.25rem 1rem;
+      border-radius: 12px;
       color: white;
-      font-weight: bold;
+      font-weight: 700;
       flex: 1;
       text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
 
       &.approved {
-        background-color: #10b981;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
       }
       &.pending {
-        background-color: #f59e0b;
+        background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
       }
       &.rejected {
-        background-color: #ef4444;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
       }
     }
   }
 }
+

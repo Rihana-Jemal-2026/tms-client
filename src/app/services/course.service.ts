@@ -2,6 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { map, catchError } from "rxjs/operators";
 import { of } from "rxjs";
+import { environment } from "../../environments/environment";
 import { Course, CourseDetail, PagedResponse } from "../models/course.model";
 
 @Injectable({
@@ -9,7 +10,7 @@ import { Course, CourseDetail, PagedResponse } from "../models/course.model";
 })
 export class CourseService {
   private http = inject(HttpClient);
-  private baseUrl = "/api/courses";
+  private readonly base = `${environment.apiUrl}/courses`;
 
   private fallbackCourses: Course[] = [
     {
@@ -44,7 +45,7 @@ export class CourseService {
 
   getAll() {
     return this.http
-      .get<PagedResponse<Course>>(this.baseUrl, {
+      .get<PagedResponse<Course>>(this.base, {
         params: { page: "1", pageSize: "50" },
       })
       .pipe(
@@ -54,7 +55,7 @@ export class CourseService {
   }
 
   getById(id: string) {
-    return this.http.get<CourseDetail>(`${this.baseUrl}/${id}`).pipe(
+    return this.http.get<CourseDetail>(`${this.base}/${id}`).pipe(
       catchError(() => {
         const found = this.fallbackCourses.find((c) => c.id === Number(id));
         return of({
@@ -64,10 +65,14 @@ export class CourseService {
           maxCapacity: found?.maxCapacity || 30,
           enrollmentCount: found?.enrollmentCount || 15,
           links: [
-            { href: `/api/courses/${id}/enroll`, rel: "enroll", method: "POST" },
+            { href: `${this.base}/${id}/enroll`, rel: "enroll", method: "POST" },
           ],
         } as CourseDetail);
       }),
     );
+  }
+
+  delete(id: number) {
+    return this.http.delete<void>(`${this.base}/${id}`);
   }
 }

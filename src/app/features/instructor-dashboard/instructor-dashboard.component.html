@@ -1,20 +1,22 @@
-<div class="dashboard-header">
-  <h1>Instructor Command Center</h1>
-  <p>Pending: {{ store.pendingCount() }}</p>
-</div>
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Instructor Command Center</h1>
+    <p class="subtitle">Reviewing student enrollments and real-time status analytics. Pending: <strong>{{ store.pendingCount() }}</strong></p>
+  </div>
 
-<div class="list-section">
-  <tms-enrollment-list />
-</div>
+  <div class="list-section">
+    <tms-enrollment-list />
+  </div>
 
-<div class="chart-section">
-  @defer (on viewport; prefetch on idle(500)) {
-    <tms-analytics-chart [data]="store.entities()" />
-  } @placeholder {
-    <div class="skeleton-chart">Scroll down to view analytics...</div>
-  } @loading (minimum 500ms) {
-    <div class="spinner">Downloading chart engine...</div>
-  } @error {
-    <p>Failed to load chart. Check your connection.</p>
-  }
+  <div class="chart-section">
+    @defer (on viewport; prefetch on idle(500)) {
+      <tms-analytics-chart [data]="store.entities()" />
+    } @placeholder {
+      <div class="skeleton-chart">Scroll down to view analytics...</div>
+    } @loading (minimum 500ms) {
+      <div class="spinner">Downloading chart engine...</div>
+    } @error {
+      <p>Failed to load chart. Check your connection.</p>
+    }
+  </div>
 </div>

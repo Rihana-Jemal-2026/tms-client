@@ -1,1 +1,22 @@
-<router-outlet />
+<header class="app-navbar">
+  <div class="nav-container">
+    <a routerLink="/dashboard" class="nav-brand">
+      <span class="brand-icon">🎓</span>
+      <span class="brand-title">TMS <span class="brand-pill">Pro</span></span>
+    </a>
+    <nav class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
+      <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
+      <a routerLink="/instructor" routerLinkActive="active">Command Center</a>
+      <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
+    </nav>
+    <div class="user-badge">
+      <div class="avatar">JS</div>
+      <span class="username">Jane Student</span>
+    </div>
+  </div>
+</header>
+<main class="app-main-content">
+  <router-outlet />
+</main>
