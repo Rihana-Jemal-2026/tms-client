@@ -5,15 +5,27 @@
       <span class="brand-title">TMS <span class="brand-pill">Pro</span></span>
     </a>
     <nav class="nav-links">
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/dashboard" routerLinkActive="active">Catalog</a>
       <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
       <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
       <a routerLink="/instructor" routerLinkActive="active">Command Center</a>
       <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
     </nav>
-    <div class="user-badge">
-      <div class="avatar">JS</div>
-      <span class="username">Jane Student</span>
+    <div class="right-actions">
+      <button
+        class="theme-toggle-btn"
+        (click)="themeService.toggleTheme()"
+        [title]="'Switch to ' + (themeService.theme() === 'dark' ? 'light' : 'dark') + ' mode'"
+      >
+        <span class="theme-icon">{{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}</span>
+        <span class="theme-label">{{ themeService.theme() === 'dark' ? 'Light' : 'Dark' }}</span>
+      </button>
+
+      <div class="user-badge">
+        <div class="avatar">JS</div>
+        <span class="username">Jane Student</span>
+        <span class="status-dot" title="Live SignalR Connected"></span>
+      </div>
     </div>
   </div>
 </header>
