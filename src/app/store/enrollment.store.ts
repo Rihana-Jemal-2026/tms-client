@@ -14,7 +14,7 @@ import {
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { pipe, concatMap, switchMap, tap, catchError, EMPTY } from "rxjs";
 import { EnrollmentService } from "../services/enrollment.service";
-import { LiveSyncService } from "../services/live-sync.service";
+import { LiveSyncService, EnrollmentStatusEvent } from "../services/live-sync.service";
 import { Enrollment } from "../models/enrollment.model";
 
 export const EnrollmentStore = signalStore(
@@ -39,7 +39,7 @@ export const EnrollmentStore = signalStore(
         pipe(
           tap(() => sync.connect()),
           switchMap(() => sync.events$),
-          tap((event) => {
+          tap((event: EnrollmentStatusEvent) => {
             const targetId = String(event.id);
             const found = store
               .entities()
