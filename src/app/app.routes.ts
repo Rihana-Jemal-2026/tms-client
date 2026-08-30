@@ -3,11 +3,25 @@ import { roleGuard } from "./guards/role.guard";
 
 export const routes: Routes = [
   {
+    path: "login",
+    loadComponent: () =>
+      import("./features/login/login.component").then(
+        (m) => m.LoginComponent,
+      ),
+  },
+  {
+    path: "command-center",
+    loadComponent: () =>
+      import(
+        "./features/instructor-dashboard/instructor-dashboard.component"
+      ).then((m) => m.InstructorDashboardComponent),
+  },
+  {
     path: "dashboard",
     loadComponent: () =>
-      import("./features/student-dashboard/student-dashboard.component").then(
-        (m) => m.StudentDashboardComponent,
-      ),
+      import(
+        "./features/instructor-dashboard/instructor-dashboard.component"
+      ).then((m) => m.InstructorDashboardComponent),
   },
   {
     path: "courses/:id",
@@ -32,7 +46,7 @@ export const routes: Routes = [
   },
   {
     path: "instructor",
-    canActivate: [roleGuard('Instructor')],
+    canActivate: [roleGuard("Instructor")],
     loadComponent: () =>
       import(
         "./features/instructor-dashboard/instructor-dashboard.component"
@@ -40,7 +54,7 @@ export const routes: Routes = [
   },
   {
     path: "grade-submission",
-    canActivate: [roleGuard('Instructor')],
+    canActivate: [roleGuard("Instructor")],
     loadComponent: () =>
       import(
         "./features/grade-submission/grade-submission.component"
@@ -48,7 +62,7 @@ export const routes: Routes = [
   },
   {
     path: "",
-    redirectTo: "dashboard",
+    redirectTo: "login",
     pathMatch: "full",
   },
 ];

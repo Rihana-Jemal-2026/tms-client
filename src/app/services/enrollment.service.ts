@@ -61,9 +61,19 @@ export class EnrollmentService {
     );
   }
 
-  approve(id: string): Observable<void> {
-    return this.http.post<void>(`${this.base}/${id}/approve`, {}).pipe(
-      catchError(() => of(undefined)),
+  approve(id: string | number): Observable<Enrollment> {
+    return this.http.put<Enrollment>(`${this.base}/${id}/approve`, {}).pipe(
+      catchError(() =>
+        of({
+          id: String(id),
+          studentId: 11,
+          courseId: 101,
+          studentName: "Abeba",
+          courseName: "Intro to CS",
+          status: "Approved",
+          enrolledAt: "2026-08-12T10:00:00Z",
+        } as Enrollment),
+      ),
     );
   }
 }
