@@ -20,6 +20,7 @@ export class EnrollmentService {
       studentName: "Dawit Abebe",
       courseName: "CS302 Web Architecture",
       status: "Pending",
+      enrolledAt: "2026-08-18T10:00:00Z",
       submittedAt: "2026-08-18T10:00:00Z",
     },
     {
@@ -29,6 +30,7 @@ export class EnrollmentService {
       studentName: "Liya Tadesse",
       courseName: "CS302 Web Architecture",
       status: "Approved",
+      enrolledAt: "2026-08-18T10:15:00Z",
       submittedAt: "2026-08-18T10:15:00Z",
     },
     {
@@ -38,6 +40,7 @@ export class EnrollmentService {
       studentName: "Abeba Kebede",
       courseName: "CS401 Database Internals",
       status: "Pending",
+      enrolledAt: "2026-08-18T11:00:00Z",
       submittedAt: "2026-08-18T11:00:00Z",
     },
     {
@@ -47,6 +50,7 @@ export class EnrollmentService {
       studentName: "Taye Bikila",
       courseName: "CS101 Modern Web Development",
       status: "Approved",
+      enrolledAt: "2026-08-18T11:30:00Z",
       submittedAt: "2026-08-18T11:30:00Z",
     },
   ];
