@@ -21,11 +21,18 @@
         <span class="theme-label">{{ themeService.theme() === 'dark' ? 'Light' : 'Dark' }}</span>
       </button>
 
-      <div class="user-badge">
-        <div class="avatar">JS</div>
-        <span class="username">Jane Student</span>
-        <span class="status-dot" title="Live SignalR Connected"></span>
-      </div>
+      @if (authService.currentUser(); as user) {
+        <div class="user-badge">
+          <div class="avatar">{{ user.displayName.slice(0, 2).toUpperCase() }}</div>
+          <div class="user-info">
+            <span class="username">{{ user.displayName }}</span>
+            <span class="role-pill">{{ user.role }}</span>
+          </div>
+          <button class="logout-btn" (click)="logout()" title="Sign Out">Sign Out</button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="login-nav-btn">Sign In / Register</a>
+      }
     </div>
   </div>
 </header>
