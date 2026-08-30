@@ -4,13 +4,18 @@
       <span class="brand-icon">🎓</span>
       <span class="brand-title">TMS <span class="brand-pill">Pro</span></span>
     </a>
-    <nav class="nav-links">
-      <a routerLink="/dashboard" routerLinkActive="active">Catalog</a>
-      <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
-      <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
-      <a routerLink="/instructor" routerLinkActive="active">Command Center</a>
-      <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
-    </nav>
+
+    <!-- Only show internal app navigation links when authenticated -->
+    @if (authService.currentUser()) {
+      <nav class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active">Catalog</a>
+        <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
+        <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
+        <a routerLink="/instructor" routerLinkActive="active">Command Center</a>
+        <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
+      </nav>
+    }
+
     <div class="right-actions">
       <button
         class="theme-toggle-btn"
@@ -31,7 +36,7 @@
           <button class="logout-btn" (click)="logout()" title="Sign Out">Sign Out</button>
         </div>
       } @else {
-        <a routerLink="/login" class="login-nav-btn">Sign In / Register</a>
+        <a routerLink="/login" class="login-nav-btn">Portal Access</a>
       }
     </div>
   </div>
