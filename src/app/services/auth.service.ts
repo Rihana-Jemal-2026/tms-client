@@ -14,6 +14,14 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -47,6 +55,12 @@ export class AuthService {
       displayName: payload.name || payload.email || 'User',
       role: payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || 'Student'
     });
+  }
+
+  async register(request: RegisterRequest): Promise<void> {
+    await firstValueFrom(
+      this.http.post<any>(`${environment.apiUrl}/auth/register`, request)
+    );
   }
 
   logout(): void {

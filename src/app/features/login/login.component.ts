@@ -11,40 +11,137 @@ import { AuthService } from "../../services/auth.service";
   template: `
     <div class="login-container">
       <div class="login-card">
-        <h2>TMS Admin Portal</h2>
-        <p class="subtitle">Please sign in to access the Command Center</p>
+        <div class="tab-header">
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="isLoginMode"
+            (click)="setMode(true)"
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="!isLoginMode"
+            (click)="setMode(false)"
+          >
+            Register Account
+          </button>
+        </div>
 
-        <form (submit)="submit($event)">
-          <div class="form-group">
-            <label for="username">Username or Email</label>
-            <input
-              id="username"
-              name="username"
-              type="text"
-              [(ngModel)]="username"
-              placeholder="admin@tms.com"
-              required
-            />
-          </div>
+        <h2>{{ isLoginMode ? "TMS Portal Access" : "Create New Account" }}</h2>
+        <p class="subtitle">
+          {{
+            isLoginMode
+              ? "Please sign in to access the TMS Command Center"
+              : "Register a new student or instructor account"
+          }}
+        </p>
 
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              [(ngModel)]="password"
-              placeholder="••••••••••••"
-              required
-            />
-          </div>
+        @if (isLoginMode) {
+          <form (submit)="submitLogin($event)">
+            <div class="form-group">
+              <label for="username">Username or Email</label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                [(ngModel)]="loginEmail"
+                placeholder="admin@tms.com"
+                required
+              />
+            </div>
 
-          @if (errorMessage) {
-            <p class="error-text">{{ errorMessage }}</p>
-          }
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                [(ngModel)]="loginPassword"
+                placeholder="••••••••••••"
+                required
+              />
+            </div>
 
-          <button type="submit" class="submit-btn">Sign In</button>
-        </form>
+            @if (errorMessage) {
+              <p class="error-text">{{ errorMessage }}</p>
+            }
+
+            <button type="submit" class="submit-btn">Sign In</button>
+          </form>
+        } @else {
+          <form (submit)="submitRegister($event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  [(ngModel)]="regFirstName"
+                  placeholder="Abeba"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  [(ngModel)]="regLastName"
+                  placeholder="Kebede"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="regEmail">Email Address</label>
+              <input
+                id="regEmail"
+                name="regEmail"
+                type="email"
+                [(ngModel)]="regEmail"
+                placeholder="user@tms.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="regPassword">Password</label>
+              <input
+                id="regPassword"
+                name="regPassword"
+                type="password"
+                [(ngModel)]="regPassword"
+                placeholder="Password123!"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="regRole">Role</label>
+              <select id="regRole" name="regRole" [(ngModel)]="regRole">
+                <option value="Student">Student</option>
+                <option value="Instructor">Instructor</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
+
+            @if (errorMessage) {
+              <p class="error-text">{{ errorMessage }}</p>
+            }
+            @if (successMessage) {
+              <p class="success-text">{{ successMessage }}</p>
+            }
+
+            <button type="submit" class="submit-btn">Create Account</button>
+          </form>
+        }
       </div>
     </div>
   `,
@@ -58,13 +155,39 @@ import { AuthService } from "../../services/auth.service";
     }
     .login-card {
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
       background: rgba(30, 41, 59, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(16px);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 2.5rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .tab-header {
+      display: flex;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: none;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
     h2 {
       margin: 0 0 0.5rem 0;
@@ -78,18 +201,25 @@ import { AuthService } from "../../services/auth.service";
       font-size: 0.9rem;
       margin-bottom: 2rem;
     }
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     label {
       color: #cbd5e1;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       font-weight: 500;
     }
-    input {
+    input, select {
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
@@ -98,7 +228,11 @@ import { AuthService } from "../../services/auth.service";
       font-size: 0.95rem;
       transition: all 0.2s ease;
     }
-    input:focus {
+    select option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    input:focus, select:focus {
       outline: none;
       border-color: #38bdf8;
       box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
@@ -125,26 +259,70 @@ import { AuthService } from "../../services/auth.service";
       font-size: 0.85rem;
       margin-bottom: 1rem;
     }
+    .success-text {
+      color: #34d399;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
   `],
 })
 export class LoginComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  username = "";
-  password = "";
-  errorMessage = "";
+  isLoginMode = true;
 
-  async submit(event: Event) {
+  loginEmail = "";
+  loginPassword = "";
+
+  regFirstName = "";
+  regLastName = "";
+  regEmail = "";
+  regPassword = "";
+  regRole = "Student";
+
+  errorMessage = "";
+  successMessage = "";
+
+  setMode(mode: boolean) {
+    this.isLoginMode = mode;
+    this.errorMessage = "";
+    this.successMessage = "";
+  }
+
+  async submitLogin(event: Event) {
     event.preventDefault();
+    this.errorMessage = "";
     try {
       await this.auth.login({
-        email: this.username || "admin@tms.com",
-        password: this.password || "Admin123!",
+        email: this.loginEmail || "admin@tms.com",
+        password: this.loginPassword || "Admin123!",
       });
       this.router.navigate(["/instructor"]);
-    } catch {
+    } catch (err: any) {
       this.router.navigate(["/instructor"]);
+    }
+  }
+
+  async submitRegister(event: Event) {
+    event.preventDefault();
+    this.errorMessage = "";
+    this.successMessage = "";
+    try {
+      await this.auth.register({
+        email: this.regEmail,
+        password: this.regPassword,
+        firstName: this.regFirstName,
+        lastName: this.regLastName,
+        role: this.regRole,
+      });
+      this.successMessage = "Account created successfully! Switching to sign in...";
+      setTimeout(() => {
+        this.loginEmail = this.regEmail;
+        this.setMode(true);
+      }, 1500);
+    } catch (err: any) {
+      this.errorMessage = err?.error?.message || "Registration failed. Try signing in.";
     }
   }
 }
