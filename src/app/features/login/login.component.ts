@@ -44,34 +44,19 @@ import { AuthService } from "../../services/auth.service";
         @if (isLoginMode) {
           <div class="form-section">
             <h3>Welcome Back</h3>
-            <p class="section-desc">Sign in to manage courses, enrollments, and grades</p>
-
-            <!-- Quick Demo Entrance -->
-            <div class="quick-entrance-box">
-              <span class="quick-title">⚡ Quick Admin & Instructor Entrance</span>
-              <div class="quick-buttons">
-                <button type="button" class="btn-quick admin" (click)="quickAdminLogin()">
-                  <span class="icon">🛡️</span> Direct Admin Sign-In
-                </button>
-                <button type="button" class="btn-quick student" (click)="quickStudentLogin()">
-                  <span class="icon">👨‍🎓</span> Student Sign-In
-                </button>
-              </div>
-            </div>
-
-            <div class="divider"><span>OR SIGN IN WITH EMAIL</span></div>
+            <p class="section-desc">Sign in with your email and password to access your dashboard</p>
 
             <form (submit)="submitLogin($event)">
               <div class="form-group">
                 <label for="username">
-                  <span class="input-icon">📧</span> Email or Username
+                  <span class="input-icon">📧</span> Email Address
                 </label>
                 <input
                   id="username"
                   name="username"
-                  type="text"
+                  type="email"
                   [(ngModel)]="loginEmail"
-                  placeholder="admin@tms.com"
+                  placeholder="name@example.com"
                   required
                 />
               </div>
@@ -95,16 +80,32 @@ import { AuthService } from "../../services/auth.service";
                   <span class="alert-icon">⚠️</span> {{ errorMessage }}
                 </div>
               }
+              @if (successMessage) {
+                <div class="alert alert-success">
+                  <span class="alert-icon">✅</span> {{ successMessage }}
+                </div>
+              }
 
-              <button type="submit" class="submit-btn main">
-                Sign In
+              <button type="submit" class="submit-btn main" [disabled]="isSubmitting">
+                {{ isSubmitting ? '⏳ Signing In...' : 'Sign In' }}
               </button>
             </form>
           </div>
         } @else {
           <div class="form-section">
             <h3>Create New Account</h3>
-            <p class="section-desc">Register as a Student, Instructor, or Administrator</p>
+            <p class="section-desc">Register as a Student or Instructor</p>
+
+            @if (errorMessage) {
+              <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span> {{ errorMessage }}
+              </div>
+            }
+            @if (successMessage) {
+              <div class="alert alert-success">
+                <span class="alert-icon">✅</span> {{ successMessage }}
+              </div>
+            }
 
             <form (submit)="submitRegister($event)">
               <div class="form-row">
@@ -163,6 +164,9 @@ import { AuthService } from "../../services/auth.service";
                   placeholder="Password123!"
                   required
                 />
+                <small class="help-text">
+                  🔒 Password must be at least 12 characters and include an uppercase letter, a digit, and a special symbol (e.g. Password123!).
+                </small>
               </div>
 
               <div class="form-group">
@@ -172,23 +176,11 @@ import { AuthService } from "../../services/auth.service";
                 <select id="regRole" name="regRole" [(ngModel)]="regRole">
                   <option value="Student">Student</option>
                   <option value="Instructor">Instructor</option>
-                  <option value="Admin">Administrator</option>
                 </select>
               </div>
 
-              @if (errorMessage) {
-                <div class="alert alert-error">
-                  <span class="alert-icon">⚠️</span> {{ errorMessage }}
-                </div>
-              }
-              @if (successMessage) {
-                <div class="alert alert-success">
-                  <span class="alert-icon">✅</span> {{ successMessage }}
-                </div>
-              }
-
-              <button type="submit" class="submit-btn register">
-                Complete Registration
+              <button type="submit" class="submit-btn register" [disabled]="isSubmitting">
+                {{ isSubmitting ? '⏳ Creating Account...' : 'Complete Registration' }}
               </button>
             </form>
           </div>
@@ -343,88 +335,6 @@ import { AuthService } from "../../services/auth.service";
       }
     }
 
-    .quick-entrance-box {
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 14px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-
-      .quick-title {
-        display: block;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #818cf8;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-bottom: 0.75rem;
-      }
-
-      .quick-buttons {
-        display: flex;
-        gap: 0.75rem;
-      }
-
-      .btn-quick {
-        flex: 1;
-        padding: 0.65rem 0.75rem;
-        font-size: 0.82rem;
-        font-weight: 700;
-        border-radius: 10px;
-        border: 1px solid transparent;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        transition: all 0.2s ease;
-        box-shadow: none;
-
-        &.admin {
-          background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-          color: white;
-
-          &:hover {
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-            transform: translateY(-1px);
-          }
-        }
-
-        &.student {
-          background: rgba(30, 41, 59, 0.8);
-          color: #e2e8f0;
-          border-color: rgba(255, 255, 255, 0.1);
-
-          &:hover {
-            border-color: #38bdf8;
-            color: #38bdf8;
-            transform: translateY(-1px);
-          }
-        }
-      }
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin: 1.5rem 0;
-
-      &::before, &::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      span {
-        padding: 0 0.8rem;
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: #64748b;
-        letter-spacing: 0.08em;
-      }
-    }
-
     .form-row {
       display: flex;
       gap: 1rem;
@@ -479,6 +389,13 @@ import { AuthService } from "../../services/auth.service";
         background: #0f172a;
         color: #f8fafc;
       }
+
+      .help-text {
+        color: #94a3b8;
+        font-size: 0.76rem;
+        margin-top: 0.25rem;
+        line-height: 1.3;
+      }
     }
 
     .alert {
@@ -516,11 +433,17 @@ import { AuthService } from "../../services/auth.service";
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       margin-top: 0.5rem;
 
+      &:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
       &.main {
         background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
         box-shadow: 0 8px 25px rgba(79, 70, 229, 0.35);
 
-        &:hover {
+        &:hover:not(:disabled) {
           transform: translateY(-2px);
           box-shadow: 0 12px 30px rgba(79, 70, 229, 0.5);
         }
@@ -530,7 +453,7 @@ import { AuthService } from "../../services/auth.service";
         background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
         box-shadow: 0 8px 25px rgba(2, 132, 199, 0.35);
 
-        &:hover {
+        &:hover:not(:disabled) {
           transform: translateY(-2px);
           box-shadow: 0 12px 30px rgba(2, 132, 199, 0.5);
         }
@@ -543,9 +466,10 @@ export class LoginComponent {
   private router = inject(Router);
 
   isLoginMode = true;
+  isSubmitting = false;
 
-  loginEmail = "admin@tms.com";
-  loginPassword = "Admin123!";
+  loginEmail = "";
+  loginPassword = "";
 
   regFirstName = "";
   regLastName = "";
@@ -556,70 +480,66 @@ export class LoginComponent {
   errorMessage = "";
   successMessage = "";
 
-  setMode(mode: boolean) {
+  setMode(mode: boolean, preserveSuccess = false) {
     this.isLoginMode = mode;
     this.errorMessage = "";
-    this.successMessage = "";
-  }
-
-  async quickAdminLogin() {
-    this.loginEmail = "admin@tms.com";
-    this.loginPassword = "Admin123!";
-    try {
-      await this.auth.login({
-        email: this.loginEmail,
-        password: this.loginPassword,
-      });
-    } catch {
-      this.auth.currentUser.set({
-        email: "admin@tms.com",
-        displayName: "Admin User",
-        role: "Admin",
-      });
+    if (!preserveSuccess) {
+      this.successMessage = "";
     }
-    this.router.navigate(["/command-center"]);
-  }
-
-  async quickStudentLogin() {
-    this.loginEmail = "student@tms.com";
-    this.loginPassword = "Password123!";
-    try {
-      await this.auth.login({
-        email: this.loginEmail,
-        password: this.loginPassword,
-      });
-    } catch {
-      this.auth.currentUser.set({
-        email: "student@tms.com",
-        displayName: "Jane Student",
-        role: "Student",
-      });
-    }
-    this.router.navigate(["/dashboard"]);
   }
 
   async submitLogin(event: Event) {
     event.preventDefault();
     this.errorMessage = "";
+    this.successMessage = "";
+
+    if (!this.loginEmail || !this.loginPassword) {
+      this.errorMessage = "Please enter both email address and password.";
+      return;
+    }
+
+    this.isSubmitting = true;
+
     try {
       await this.auth.login({
-        email: this.loginEmail || "admin@tms.com",
-        password: this.loginPassword || "Admin123!",
+        email: this.loginEmail,
+        password: this.loginPassword,
       });
+
+      const user = this.auth.currentUser();
+      this.successMessage = `Welcome back! Signing you in...`;
+
+      setTimeout(() => {
+        this.isSubmitting = false;
+        if (user?.role === "Admin") {
+          this.router.navigate(["/command-center"]);
+        } else if (user?.role === "Instructor") {
+          this.router.navigate(["/instructor-dashboard"]);
+        } else {
+          this.router.navigate(["/dashboard"]);
+        }
+      }, 900);
     } catch (err: any) {
-      this.auth.currentUser.set({
-        email: this.loginEmail || "admin@tms.com",
-        displayName: "Admin User",
-        role: "Admin",
-      });
+      this.isSubmitting = false;
+      this.errorMessage =
+        err?.error?.detail ||
+        err?.error?.message ||
+        "Invalid email or password. Please check your credentials and try again.";
     }
-    this.router.navigate(["/command-center"]);
   }
 
   async submitRegister(event: Event) {
     event.preventDefault();
     this.errorMessage = "";
     this.successMessage = "";
+
+    if (!this.regEmail || !this.regPassword || !this.regFirstName || !this.regLastName) {
+      this.errorMessage = "Please fill in all required fields (First Name, Last Name, Email, Password).";
+      return;
+    }
+
+    this.isSubmitting = true;
+
     try {
       await this.auth.register({
         email: this.regEmail,
@@ -628,13 +548,27 @@ export class LoginComponent {
         lastName: this.regLastName,
         role: this.regRole,
       });
-      this.successMessage = "Account registered successfully! Switching to sign in...";
+
+      const registeredEmail = this.regEmail;
+      this.successMessage = `Account registered successfully! Switching to Sign In...`;
+
       setTimeout(() => {
-        this.loginEmail = this.regEmail;
-        this.setMode(true);
-      }, 1400);
+        this.loginEmail = registeredEmail;
+        this.setMode(true, true);
+        this.successMessage = `🎉 Account registered successfully for ${registeredEmail}! Please enter your password below to sign in.`;
+        this.isSubmitting = false;
+      }, 1200);
     } catch (err: any) {
-      this.errorMessage = err?.error?.message || "Registration completed. Proceed to Sign In.";
+      this.isSubmitting = false;
+      const backendErrors = err?.error?.errors;
+      if (Array.isArray(backendErrors) && backendErrors.length > 0) {
+        this.errorMessage = backendErrors.join(" ");
+      } else {
+        this.errorMessage =
+          err?.error?.message ||
+          err?.error?.detail ||
+          "Registration failed. Please ensure your password is at least 12 characters long and includes an uppercase letter, a digit, and a special symbol.";
+      }
     }
   }
 }
