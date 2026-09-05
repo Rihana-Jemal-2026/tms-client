@@ -48,12 +48,33 @@ export class AuthService {
     );
     this.accessToken.set(res.accessToken);
 
-    // Decode user payload from JWT (or fetch /api/auth/me)
+    // Decode user payload from JWT
     const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
+    
+    const email =
+      payload.email ||
+      payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+      payload.sub ||
+      '';
+
+    const firstName = payload.FirstName || payload.given_name || '';
+    const lastName = payload.LastName || payload.family_name || '';
+    const fullName =
+      firstName || lastName
+        ? `${firstName} ${lastName}`.trim()
+        : payload.name ||
+          payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+          (email ? email.split('@')[0] : 'User');
+
+    const role =
+      payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      payload.role ||
+      'Student';
+
     this.currentUser.set({
-      email: payload.email || payload.sub,
-      displayName: payload.name || payload.email || 'User',
-      role: payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || 'Student'
+      email,
+      displayName: fullName,
+      role,
     });
   }
 

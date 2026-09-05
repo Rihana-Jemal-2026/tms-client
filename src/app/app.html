@@ -1,46 +1,54 @@
-<header class="app-navbar">
-  <div class="nav-container">
-    <a routerLink="/dashboard" class="nav-brand">
-      <span class="brand-icon">🎓</span>
-      <span class="brand-title">TMS <span class="brand-pill">Pro</span></span>
-    </a>
+<app-three-background />
 
-    <!-- Only show internal app navigation links when authenticated -->
-    @if (authService.currentUser()) {
-      <nav class="nav-links">
-        <a routerLink="/dashboard" routerLinkActive="active">Catalog</a>
-        <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
-        <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
-        <a routerLink="/instructor" routerLinkActive="active">Command Center</a>
-        <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
-      </nav>
-    }
+@if (!isAuthPage()) {
+  <header class="app-navbar">
+    <div class="nav-container">
+      <a routerLink="/dashboard" class="nav-brand">
+        <span class="material-symbols-outlined brand-icon">school</span>
+        <span class="brand-title">TMS <span class="brand-pill">Pro</span></span>
+      </a>
 
-    <div class="right-actions">
-      <button
-        class="theme-toggle-btn"
-        (click)="themeService.toggleTheme()"
-        [title]="'Switch to ' + (themeService.theme() === 'dark' ? 'light' : 'dark') + ' mode'"
-      >
-        <span class="theme-icon">{{ themeService.theme() === 'dark' ? '☀️' : '🌙' }}</span>
-        <span class="theme-label">{{ themeService.theme() === 'dark' ? 'Light' : 'Dark' }}</span>
-      </button>
+      @if (authService.currentUser()) {
+        <nav class="nav-links">
+          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+          <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
+          <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
+          <a routerLink="/certificates" routerLinkActive="active">Certificates</a>
 
-      @if (authService.currentUser(); as user) {
-        <div class="user-badge">
-          <div class="avatar">{{ user.displayName.slice(0, 2).toUpperCase() }}</div>
-          <div class="user-info">
-            <span class="username">{{ user.displayName }}</span>
-            <span class="role-pill">{{ user.role }}</span>
-          </div>
-          <button class="logout-btn" (click)="logout()" title="Sign Out">Sign Out</button>
-        </div>
-      } @else {
-        <a routerLink="/login" class="login-nav-btn">Portal Access</a>
+          @if (authService.hasRole('Instructor')) {
+            <a routerLink="/instructor" routerLinkActive="active">Instructor Portal</a>
+            <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
+            <a routerLink="/reports" routerLinkActive="active">Reports</a>
+          }
+        </nav>
       }
+
+      <div class="right-actions">
+        <button
+          class="theme-toggle-btn"
+          (click)="themeService.toggleTheme()"
+          [title]="'Switch to ' + (themeService.theme() === 'dark' ? 'light' : 'dark') + ' mode'"
+        >
+          <span class="material-symbols-outlined theme-icon">{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</span>
+          <span class="theme-label">{{ themeService.theme() === 'dark' ? 'Light' : 'Dark' }}</span>
+        </button>
+
+        @if (authService.currentUser(); as user) {
+          <div class="user-badge">
+            <div class="avatar">{{ user.displayName.slice(0, 2).toUpperCase() }}</div>
+            <div class="user-info">
+              <span class="username">{{ user.displayName }}</span>
+              <span class="role-pill">{{ user.role }}</span>
+            </div>
+            <button class="logout-btn" (click)="logout()" title="Sign Out">Sign Out</button>
+          </div>
+        } @else {
+          <a routerLink="/login" class="login-nav-btn">Portal Access</a>
+        }
+      </div>
     </div>
-  </div>
-</header>
+  </header>
+}
 <main class="app-main-content">
   <router-outlet />
 </main>

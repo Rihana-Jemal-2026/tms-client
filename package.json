@@ -22,7 +22,9 @@
     "@angular/router": "^22.1.0",
     "@microsoft/signalr": "^10.0.11",
     "@ngrx/signals": "^21.1.1",
+    "@types/three": "^0.185.4",
     "rxjs": "~7.8.0",
+    "three": "^0.185.1",
     "tslib": "^2.3.0",
     "zone.js": "^0.16.2"
   },

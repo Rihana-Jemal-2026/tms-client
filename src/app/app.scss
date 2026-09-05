@@ -29,7 +29,10 @@
     color: var(--text-main);
 
     .brand-icon {
-      font-size: 1.5rem;
+      font-size: 1.7rem;
+      color: #6366f1;
+      display: flex;
+      align-items: center;
     }
 
     .brand-title {
@@ -108,7 +111,9 @@
     }
 
     .theme-icon {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
       transition: transform 0.3s ease;
     }
   }
@@ -198,4 +203,7 @@
 .app-main-content {
   min-height: calc(100vh - 75px);
   padding-bottom: 3rem;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }

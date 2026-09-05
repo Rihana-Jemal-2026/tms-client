@@ -1,22 +1,335 @@
-<div class="dashboard">
-  <div class="dashboard-header">
-    <h1>Instructor Command Center</h1>
-    <p class="subtitle">Reviewing student enrollments and real-time status analytics. Pending: <strong>{{ store.pendingCount() }}</strong></p>
+<div class="command-center-container">
+  <!-- Header Section -->
+  <div class="center-header">
+    <div>
+      <div class="hero-badge">
+        <span class="material-symbols-outlined icon-sm">school</span> FACULTY &amp; INSTRUCTOR PORTAL
+      </div>
+      <h1>Instructor Academic Portal</h1>
+      <p class="subtitle">Manage course cohorts, student enrollment requests, syllabus rosters, and academic grading.</p>
+    </div>
+
+    <div class="actions-group">
+      <span class="action-pill urgent">
+        <span class="pulse-dot"></span>
+        <span><strong>{{ store.pendingCount() }}</strong> Pending Approval Requests</span>
+      </span>
+      <a routerLink="/grade-submission" class="btn-primary-glow">
+        <span class="material-symbols-outlined">grading</span> Grade Submissions
+      </a>
+      <a routerLink="/reports" class="btn-secondary-glow">
+        <span class="material-symbols-outlined">analytics</span> Reports
+      </a>
+    </div>
   </div>
 
-  <div class="list-section">
-    <tms-enrollment-list />
+  <!-- Metric Cards 4-Column Grid -->
+  <div class="metrics-grid">
+    <!-- Stat 1: Total Courses Taught -->
+    <div class="glass-card cyber-glow">
+      <div class="card-top">
+        <div>
+          <p class="card-label">Total Courses Taught</p>
+          <h2 class="metric-value">4</h2>
+        </div>
+        <div class="icon-box blue">
+          <span class="material-symbols-outlined">menu_book</span>
+        </div>
+      </div>
+      <div class="progress-bar-bg mt-4">
+        <div class="progress-fill indigo" style="width: 25%"></div>
+      </div>
+    </div>
+
+    <!-- Stat 2: Active Students -->
+    <div class="glass-card cyber-glow">
+      <div class="card-top">
+        <div>
+          <p class="card-label">Active Students</p>
+          <h2 class="metric-value">142</h2>
+        </div>
+        <div class="icon-box cyan">
+          <span class="material-symbols-outlined">group</span>
+        </div>
+      </div>
+      <div class="metric-trend success mt-4">
+        <span class="material-symbols-outlined text-sm">trending_up</span>
+        <span>+12% this term</span>
+      </div>
+    </div>
+
+    <!-- Stat 3: Approvals Pending -->
+    <div class="glass-card cyber-glow warning-glow">
+      <div class="card-top">
+        <div>
+          <p class="card-label error-text">Approvals Pending</p>
+          <h2 class="metric-value text-amber">{{ store.pendingCount() }}</h2>
+        </div>
+        <div class="icon-box red relative">
+          <span class="pulse-ring"></span>
+          <span class="material-symbols-outlined">assignment_late</span>
+        </div>
+      </div>
+      <p class="metric-sub-text">Action required for enrollment</p>
+    </div>
+
+    <!-- Stat 4: Avg Performance -->
+    <div class="glass-card cyber-glow">
+      <div class="card-top">
+        <div>
+          <p class="card-label">Avg Performance</p>
+          <h2 class="metric-value text-gold">88<small>%</small></h2>
+        </div>
+        <div class="icon-box gold">
+          <span class="material-symbols-outlined">star</span>
+        </div>
+      </div>
+      <div class="progress-bar-bg mt-4">
+        <div class="progress-fill gold" style="width: 88%"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="chart-section">
-    @defer (on viewport; prefetch on idle(500)) {
-      <tms-analytics-chart [data]="store.entities()" />
-    } @placeholder {
-      <div class="skeleton-chart">Scroll down to view analytics...</div>
-    } @loading (minimum 500ms) {
-      <div class="spinner">Downloading chart engine...</div>
-    } @error {
-      <p>Failed to load chart. Check your connection.</p>
-    }
+  <!-- Main Content Layout Grid (8 / 4 Split) -->
+  <div class="dashboard-content-grid">
+    <!-- Left Column (8/12): Capacity Monitor & Grade Distribution -->
+    <div class="main-column">
+      <!-- Course Capacity Monitor Section -->
+      <div class="glass-section">
+        <div class="section-title-bar">
+          <div>
+            <h2><span class="material-symbols-outlined icon-cyan">monitor_heart</span> Course Capacity Monitor</h2>
+            <p class="section-subtitle">Live seat availability for your active cohorts.</p>
+          </div>
+          <button class="btn-filter-icon">
+            <span class="material-symbols-outlined text-sm">filter_list</span> Filter
+          </button>
+        </div>
+
+        <div class="course-capacity-grid">
+          <!-- Course Card 1: Advanced Database Migration -->
+          <div class="capacity-course-card border-indigo">
+            <div class="card-header-row">
+              <div>
+                <h3 class="course-name">Advanced Database Migration</h3>
+                <p class="cohort-info">Cohort A • Mon/Wed 10AM</p>
+              </div>
+              <button class="btn-more"><span class="material-symbols-outlined">more_vert</span></button>
+            </div>
+
+            <div class="meter-box">
+              <div class="meter-labels">
+                <span>Occupied</span>
+                <strong>45 / 50 Seats</strong>
+              </div>
+              <div class="capacity-track">
+                <div class="capacity-fill red" style="width: 90%"></div>
+              </div>
+              <span class="capacity-status-text error">Near Capacity</span>
+            </div>
+
+            <div class="card-actions-footer">
+              <div class="icon-buttons-group">
+                <button class="action-circle-btn" title="Edit Course"><span class="material-symbols-outlined">edit</span></button>
+                <button class="action-circle-btn" title="Syllabus"><span class="material-symbols-outlined">menu_book</span></button>
+                <a routerLink="/grade-submission" class="action-circle-btn" title="Grade Hub"><span class="material-symbols-outlined">grading</span></a>
+              </div>
+              <a routerLink="/enrollments" class="link-roster text-indigo">View Roster →</a>
+            </div>
+          </div>
+
+          <!-- Course Card 2: Zero Trust Implementation -->
+          <div class="capacity-course-card border-cyan">
+            <div class="card-header-row">
+              <div>
+                <h3 class="course-name">Zero Trust Implementation</h3>
+                <p class="cohort-info">Cohort C • Tue/Thu 2PM</p>
+              </div>
+              <button class="btn-more"><span class="material-symbols-outlined">more_vert</span></button>
+            </div>
+
+            <div class="meter-box">
+              <div class="meter-labels">
+                <span>Occupied</span>
+                <strong>18 / 30 Seats</strong>
+              </div>
+              <div class="capacity-track">
+                <div class="capacity-fill cyan" style="width: 60%"></div>
+              </div>
+              <span class="capacity-status-text cyan">Available Seats</span>
+            </div>
+
+            <div class="card-actions-footer">
+              <div class="icon-buttons-group">
+                <button class="action-circle-btn" title="Edit Course"><span class="material-symbols-outlined">edit</span></button>
+                <button class="action-circle-btn" title="Syllabus"><span class="material-symbols-outlined">menu_book</span></button>
+                <a routerLink="/grade-submission" class="action-circle-btn" title="Grade Hub"><span class="material-symbols-outlined">grading</span></a>
+              </div>
+              <a routerLink="/enrollments" class="link-roster text-cyan">View Roster →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Class Grade Distribution SVG Bar Chart -->
+      <div class="glass-section">
+        <div class="section-title-bar">
+          <div>
+            <h2><span class="material-symbols-outlined icon-indigo">bar_chart</span> Class Grade Distribution</h2>
+            <p class="section-subtitle">Aggregate performance across all active cohorts.</p>
+          </div>
+          <div class="target-badge">
+            <span class="target-dot"></span> Target &gt;85%
+          </div>
+        </div>
+
+        <div class="svg-chart-container">
+          <div class="chart-grid-lines">
+            <div class="grid-line"><span class="line-label">100%</span></div>
+            <div class="grid-line"><span class="line-label">75%</span></div>
+            <div class="grid-line"><span class="line-label">50%</span></div>
+            <div class="grid-line"><span class="line-label">25%</span></div>
+            <div class="grid-line"><span class="line-label">0%</span></div>
+          </div>
+
+          <div class="chart-bars-row">
+            <div class="bar-column">
+              <div class="bar-fill grade-a" style="height: 90%" title="A: 45% of students">
+                <span class="bar-tooltip">45%</span>
+              </div>
+              <span class="grade-code">A</span>
+            </div>
+
+            <div class="bar-column">
+              <div class="bar-fill grade-b" style="height: 60%" title="B: 30% of students">
+                <span class="bar-tooltip">30%</span>
+              </div>
+              <span class="grade-code">B</span>
+            </div>
+
+            <div class="bar-column">
+              <div class="bar-fill grade-c" style="height: 30%" title="C: 15% of students">
+                <span class="bar-tooltip">15%</span>
+              </div>
+              <span class="grade-code">C</span>
+            </div>
+
+            <div class="bar-column">
+              <div class="bar-fill grade-d" style="height: 16%" title="D: 8% of students">
+                <span class="bar-tooltip">8%</span>
+              </div>
+              <span class="grade-code">D</span>
+            </div>
+
+            <div class="bar-column">
+              <div class="bar-fill grade-f" style="height: 4%" title="F: 2% of students">
+                <span class="bar-tooltip">2%</span>
+              </div>
+              <span class="grade-code">F</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Enrollment Queue List -->
+      <div class="glass-section">
+        <div class="section-title-bar">
+          <h2><span class="material-symbols-outlined icon-indigo">list_alt</span> Real-Time Enrollment Queue</h2>
+          <a routerLink="/enrollments" class="link-more">View Full List →</a>
+        </div>
+        
+        <tms-enrollment-list [embedded]="true" />
+      </div>
+    </div>
+
+    <!-- Right Column (4/12): Approval Queue & Analytics -->
+    <div class="sidebar-column">
+      <!-- Approval Queue Card -->
+      <div class="glass-section queue-section">
+        <div class="section-title-bar">
+          <div>
+            <h2>
+              <span class="material-symbols-outlined icon-amber">how_to_reg</span> Approval Queue
+              <span class="live-dot-red"></span>
+            </h2>
+            <p class="section-subtitle">{{ store.pendingCount() }} requests require review</p>
+          </div>
+        </div>
+
+        <div class="queue-cards-list">
+          <div class="queue-item-box">
+            <div class="user-row">
+              <div class="user-avatar">AA</div>
+              <div>
+                <strong class="user-name">Abebe Alemu</strong>
+                <span class="request-date">Oct 24, 2026</span>
+              </div>
+            </div>
+            <div class="course-req-pill">
+              <span class="text-primary">Req:</span> Advanced Database Migration
+            </div>
+            <div class="action-buttons-row">
+              <button class="btn-action-icon reject" (click)="reject('ENV-101')" title="Reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="btn-action-icon approve" (click)="approve('ENV-101')" title="Approve"><span class="material-symbols-outlined">check</span></button>
+            </div>
+          </div>
+
+          <div class="queue-item-box">
+            <div class="user-row">
+              <div class="user-avatar">AT</div>
+              <div>
+                <strong class="user-name">Alemu Tadesse</strong>
+                <span class="request-date">Oct 23, 2026</span>
+              </div>
+            </div>
+            <div class="course-req-pill">
+              <span class="text-tertiary">Req:</span> Zero Trust Implementation
+            </div>
+            <div class="action-buttons-row">
+              <button class="btn-action-icon reject" (click)="reject('ENV-102')" title="Reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="btn-action-icon approve" (click)="approve('ENV-102')" title="Approve"><span class="material-symbols-outlined">check</span></button>
+            </div>
+          </div>
+
+          <div class="queue-item-box">
+            <div class="user-row">
+              <div class="user-avatar">RM</div>
+              <div>
+                <strong class="user-name">Rihana Mohammed</strong>
+                <span class="request-date">Oct 23, 2026</span>
+              </div>
+            </div>
+            <div class="course-req-pill">
+              <span class="text-primary">Req:</span> Web Architecture & Cloud Services
+            </div>
+            <div class="action-buttons-row">
+              <button class="btn-action-icon reject" (click)="reject('ENV-103')" title="Reject"><span class="material-symbols-outlined">close</span></button>
+              <button class="btn-action-icon approve" (click)="approve('ENV-103')" title="Approve"><span class="material-symbols-outlined">check</span></button>
+            </div>
+          </div>
+        </div>
+
+        <a routerLink="/enrollments" class="btn-view-all-queue">View All Requests →</a>
+      </div>
+
+      <!-- Performance Analytics Chart Section -->
+      <div class="glass-section">
+        <div class="section-title-bar">
+          <h2><span class="material-symbols-outlined icon-indigo">analytics</span> Performance Analytics</h2>
+        </div>
+
+        <div class="chart-wrapper">
+          @defer (on viewport; prefetch on idle(500)) {
+            <tms-analytics-chart [data]="store.entities()" />
+          } @placeholder {
+            <div class="skeleton-chart">Scroll down to view analytics...</div>
+          } @loading (minimum 500ms) {
+            <div class="spinner">Loading chart engine...</div>
+          } @error {
+            <p class="error-msg">Failed to load analytics chart.</p>
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </div>

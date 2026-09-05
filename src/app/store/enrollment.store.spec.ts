@@ -11,8 +11,8 @@ describe("EnrollmentStore", () => {
   let store: any;
 
   const mockRows: Enrollment[] = [
-    { id: 1, studentId: 11, studentName: "Abeba", courseId: 101, courseName: "Intro to CS", status: "Pending", enrolledAt: "2026-08-12T10:00:00Z" },
-    { id: 2, studentId: 12, studentName: "Kebede", courseId: 102, courseName: "Data Structures", status: "Approved", enrolledAt: "2026-08-12T10:05:00Z" },
+    { id: "1", studentId: 11, studentName: "Abeba", courseId: 101, courseName: "Intro to CS", status: "Pending", enrolledAt: "2026-08-12T10:00:00Z" },
+    { id: "2", studentId: 12, studentName: "Kebede", courseId: 102, courseName: "Data Structures", status: "Approved", enrolledAt: "2026-08-12T10:05:00Z" },
   ];
 
   beforeEach(() => {

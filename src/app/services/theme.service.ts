@@ -29,6 +29,7 @@ export class ThemeService {
   private getInitialTheme(): ThemeMode {
     const saved = localStorage.getItem('tms-theme') as ThemeMode | null;
     if (saved === 'light' || saved === 'dark') return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Default to sleek dark mode for maximum aesthetic appeal
+    return 'dark';
   }
 }

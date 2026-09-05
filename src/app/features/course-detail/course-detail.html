@@ -1,3 +1,206 @@
-<h1>Course Detail</h1>
-<p>Course ID: {{ id() }}</p>
-<a routerLink="/dashboard">Back to Dashboard</a>
+<div class="course-detail-container">
+  <!-- Hero Banner -->
+  <div class="detail-hero-banner">
+    <div class="hero-content">
+      <!-- Breadcrumb Navigation -->
+      <nav class="breadcrumb-nav">
+        <a routerLink="/dashboard" class="crumb-link">
+          <span class="material-symbols-outlined icon-sm">menu_book</span> Catalog
+        </a>
+        <span class="material-symbols-outlined crumb-sep">chevron_right</span>
+        <span class="crumb-current">CS-{{ id() }}</span>
+      </nav>
+
+      <!-- Title & Badges -->
+      <h1 class="hero-title">
+        CS-{{ id() }}: Enterprise <br />
+        <span class="gradient-text">Distributed Systems</span>
+      </h1>
+
+      <div class="badges-row">
+        <span class="category-badge">
+          <span class="material-symbols-outlined icon-sm">dns</span> Distributed Systems
+        </span>
+
+        <span class="urgent-seats-badge">
+          <span class="pulse-dot"></span>
+          <span class="material-symbols-outlined icon-sm">warning</span> 38/40 Seats Filled
+        </span>
+      </div>
+
+      <!-- Instructor Profile -->
+      <div class="instructor-profile-bar">
+        <div class="instructor-avatar">MV</div>
+        <div>
+          <strong class="instructor-name">Dr. Marcus Vance</strong>
+          <span class="instructor-role">Lead Systems Architect</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout (8 / 4 Split) -->
+  <div class="detail-main-grid">
+    <!-- Left Column: Navigation Tabs & Tab Content -->
+    <div class="content-col">
+      <!-- Tab Navigation Bar -->
+      <div class="detail-tabs-bar">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'syllabus'"
+          (click)="setTab('syllabus')"
+        >
+          Syllabus
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'prereqs'"
+          (click)="setTab('prereqs')"
+        >
+          Prerequisites
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'reviews'"
+          (click)="setTab('reviews')"
+        >
+          Reviews
+        </button>
+      </div>
+
+      <!-- TAB CONTENT: SYLLABUS -->
+      <div *ngIf="activeTab() === 'syllabus'" class="tab-pane">
+        <h2 class="pane-title">
+          <span class="material-symbols-outlined icon-indigo">view_timeline</span> Course Roadmap
+        </h2>
+
+        <div class="accordion-list">
+          <div *ngFor="let mod of modules()" class="accordion-card">
+            <button class="accordion-header" (click)="toggleModule(mod.id)">
+              <div class="module-left">
+                <div class="module-num">0{{ mod.id }}</div>
+                <div>
+                  <h3 class="module-title">{{ mod.title }}</h3>
+                  <p class="module-sub">{{ mod.subtitle }}</p>
+                </div>
+              </div>
+
+              <span class="material-symbols-outlined chevron" [class.rotated]="mod.isOpen">
+                expand_more
+              </span>
+            </button>
+
+            <div *ngIf="mod.isOpen" class="accordion-body">
+              <p class="mod-desc">{{ mod.description }}</p>
+              <ul class="mod-list">
+                <li *ngFor="let item of mod.items">{{ item }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: PREREQUISITES -->
+      <div *ngIf="activeTab() === 'prereqs'" class="tab-pane">
+        <h2 class="pane-title">
+          <span class="material-symbols-outlined icon-cyan">verified</span> Required Knowledge
+        </h2>
+
+        <div class="prereqs-box glass-panel-box">
+          <ul class="prereq-list">
+            <li *ngFor="let prereq of prerequisites">
+              <span class="material-symbols-outlined icon-green">check_circle</span>
+              <span>{{ prereq }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TAB CONTENT: REVIEWS -->
+      <div *ngIf="activeTab() === 'reviews'" class="tab-pane">
+        <h2 class="pane-title">
+          <span class="material-symbols-outlined icon-gold">star</span> Student Reviews
+        </h2>
+
+        <div class="reviews-list">
+          <div *ngFor="let rev of reviews" class="review-card glass-panel-box">
+            <div class="review-top">
+              <div>
+                <strong class="review-author">{{ rev.author }}</strong>
+                <span class="review-role">{{ rev.role }}</span>
+              </div>
+              <span class="review-date">{{ rev.date }}</span>
+            </div>
+
+            <div class="stars-row">
+              <span *ngFor="let s of [1,2,3,4,5]" class="material-symbols-outlined star-icon">star</span>
+            </div>
+
+            <p class="review-comment">"{{ rev.comment }}"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Sticky Tuition CTA Card -->
+    <div class="cta-col">
+      <div class="sticky-cta-card glass-panel-box">
+        <div class="tuition-header">
+          <div>
+            <span class="tuition-label">Tuition</span>
+            <h2 class="price-val">$1,499<small>.00</small></h2>
+          </div>
+          <div class="wallet-icon-box">
+            <span class="material-symbols-outlined icon-indigo">account_balance_wallet</span>
+          </div>
+        </div>
+
+        <div class="stats-grid-two">
+          <div class="mini-stat-box">
+            <span class="material-symbols-outlined icon-cyan">calendar_month</span>
+            <strong class="val-text">8 Weeks</strong>
+            <span class="lbl-text">Duration</span>
+          </div>
+
+          <div class="mini-stat-box">
+            <span class="material-symbols-outlined icon-cyan">schedule</span>
+            <strong class="val-text">12h / wk</strong>
+            <span class="lbl-text">Commitment</span>
+          </div>
+        </div>
+
+        <!-- Seat Capacity Meter -->
+        <div class="seat-capacity-box">
+          <div class="meter-labels">
+            <span>Seat Capacity</span>
+            <strong class="error-text">95% Full</strong>
+          </div>
+          <div class="capacity-track">
+            <div class="capacity-fill red" style="width: 95%">
+              <div class="shimmer-effect"></div>
+            </div>
+          </div>
+          <p class="remaining-note">Only 2 seats remaining for the upcoming cohort.</p>
+        </div>
+
+        <!-- CTA Action Button -->
+        <a routerLink="/enroll" class="btn-apply-cta">
+          Apply for Enrollment
+          <span class="material-symbols-outlined icon-arrow">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HATEOAS REST API Bar Footer -->
+  <div class="hateoas-api-bar">
+    <span class="api-label">[API_RELS]</span>
+    <code class="rel-tag active">rel: "self"</code>
+    <code class="rel-tag">rel: "enrollments"</code>
+    <code class="rel-tag">rel: "prerequisites"</code>
+    <code class="rel-tag">rel: "instructor"</code>
+  </div>
+</div>

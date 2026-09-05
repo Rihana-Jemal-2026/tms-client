@@ -1,0 +1,234 @@
+<div class="certs-hub-container">
+  <!-- Decorative Glow Blurs -->
+  <div class="glow-bg-top-right"></div>
+  <div class="glow-bg-bottom-left"></div>
+
+  <!-- Hero Section -->
+  <section class="certs-hero-section">
+    <div class="badge-gold-header">
+      <div class="gold-icon-circle">
+        <span class="material-symbols-outlined icon-gold">verified</span>
+      </div>
+      <span class="lbl-gold">Official Credentials</span>
+    </div>
+
+    <h1 class="hero-title">Student Digital Certificates Hub</h1>
+    <p class="hero-subtitle">
+      Access, verify, and share your earned academic credentials. All certificates are cryptographically signed and blockchain-verified.
+    </p>
+  </section>
+
+  <!-- Main Content Split Layout (4 / 8 Grid) -->
+  <div class="certs-main-grid">
+    <!-- Left Column: Verification & Stats Panel -->
+    <div class="panel-left-col">
+      <!-- Verify Authenticity Card -->
+      <div class="verify-card glass-panel-box">
+        <div class="card-title-row">
+          <span class="material-symbols-outlined icon-cyan">search</span>
+          <h2>Verify Authenticity</h2>
+        </div>
+        <p class="card-desc">Enter a credential ID to confirm its origin and integrity.</p>
+
+        <div class="verify-input-group">
+          <input
+            type="text"
+            [value]="verifyCodeInput()"
+            (input)="verifyCodeInput.set($any($event.target).value)"
+            (keyup.enter)="verifyCode()"
+            placeholder="e.g. VER-CS302-DAWIT-992"
+          />
+          <button type="button" class="btn-arrow-submit" (click)="verifyCode()" [disabled]="isVerifying()">
+            <span *ngIf="!isVerifying()" class="material-symbols-outlined">arrow_forward</span>
+            <span *ngIf="isVerifying()" class="material-symbols-outlined icon-spin">refresh</span>
+          </button>
+        </div>
+
+        <!-- Instant Verification Feedback Card -->
+        <div *ngIf="verificationResult()" class="verification-feedback-card" [class.valid]="verificationResult()?.valid" [class.invalid]="!verificationResult()?.valid">
+          <div *ngIf="verificationResult()?.valid" class="feedback-content">
+            <span class="material-symbols-outlined icon-check">check_circle</span>
+            <div>
+              <strong class="feedback-title">Valid Credential</strong>
+              <div class="feedback-details">
+                <p>ID: <span class="font-mono">{{ verificationResult()?.certificate?.certificateNumber }}</span></p>
+                <p>Course: <strong>{{ verificationResult()?.certificate?.courseTitle }}</strong></p>
+                <p>Signer: {{ verificationResult()?.certificate?.instructorName }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!verificationResult()?.valid" class="feedback-content invalid">
+            <span class="material-symbols-outlined icon-error">cancel</span>
+            <div>
+              <strong class="feedback-title error">Invalid Credential</strong>
+              <p class="error-msg">{{ verificationResult()?.message }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats / Summary Card -->
+      <div class="stats-card glass-panel-box">
+        <div>
+          <span class="lbl-uppercase">Total Earned</span>
+          <strong class="display-val">{{ certificates().length }}</strong>
+        </div>
+
+        <div class="radial-ring-box">
+          <svg class="ring-svg" viewBox="0 0 36 36">
+            <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path>
+            <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="100, 100" stroke-dashoffset="0" stroke-linecap="round" stroke-width="3"></path>
+          </svg>
+          <span class="material-symbols-outlined icon-medal">military_tech</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Certificate Cards Grid -->
+    <div class="cards-right-col">
+      <!-- Empty State for Students with 0 Certificates -->
+      <div *ngIf="filteredCertificates().length === 0" class="empty-certificates-card glass-panel-box">
+        <span class="material-symbols-outlined icon-empty">workspace_premium</span>
+        <h3>No Certificates Earned Yet</h3>
+        <p>No verified academic certificates are registered under your account (<strong>{{ currentUser()?.displayName }}</strong>). Complete your active courses to receive official cryptographically signed certificates!</p>
+      </div>
+
+      <div *ngIf="filteredCertificates().length > 0" class="certs-cards-grid">
+        <div *ngFor="let cert of filteredCertificates()" class="cert-card-glass">
+          <!-- Background Medal Watermark -->
+          <span class="material-symbols-outlined watermark-medal">workspace_premium</span>
+
+          <div class="cert-card-content">
+            <div class="cert-card-top">
+              <div class="gold-icon-badge">
+                <span class="material-symbols-outlined">workspace_premium</span>
+              </div>
+              <span class="grade-badge">Grade {{ cert.grade }}</span>
+            </div>
+
+            <h3 class="cert-course-title">{{ cert.courseCode }}: {{ cert.courseTitle }}</h3>
+            <p class="cert-student-name">{{ cert.studentName }}</p>
+
+            <div class="skills-tags-row">
+              <span *ngFor="let skill of cert.skillsAcquired" class="skill-pill">{{ skill }}</span>
+            </div>
+
+            <div class="cert-card-footer">
+              <div class="issue-meta">
+                <span class="lbl-issue">Issued</span>
+                <strong class="val-date">{{ cert.issueDate | date:'mediumDate' }}</strong>
+              </div>
+
+              <button type="button" class="btn-view-credential" (click)="openCertificateModal(cert)">
+                View <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Printable Certificate Modal Viewer (Formal High-Res Render) -->
+  <div *ngIf="selectedCert()" class="modal-overlay-backdrop" (click)="closeModal()">
+    <div class="modal-dialog-paper" (click)="$event.stopPropagation()">
+      <div class="modal-header-bar">
+        <div class="header-title-flex">
+          <span class="material-symbols-outlined icon-primary">workspace_premium</span>
+          <h2>Certificate Preview</h2>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- High-Res Formal Printable Certificate Canvas (Landscape) -->
+      <div class="certificate-paper-document">
+        <!-- Outer & Inner Gold Borders -->
+        <div class="gold-double-border"></div>
+        <div class="gold-inner-border"></div>
+
+        <!-- Ornamental Corners (SVG) -->
+        <svg class="corner-ornament top-left" viewBox="0 0 100 100">
+          <path d="M 0,20 L 20,20 L 20,0 M 20,20 Q 50,50 80,80" fill="none" stroke="#D4AF37" stroke-width="2"></path>
+          <rect x="5" y="5" width="10" height="10" fill="#D4AF37"></rect>
+        </svg>
+
+        <svg class="corner-ornament top-right" viewBox="0 0 100 100">
+          <path d="M 0,20 L 20,20 L 20,0 M 20,20 Q 50,50 80,80" fill="none" stroke="#D4AF37" stroke-width="2"></path>
+          <rect x="5" y="5" width="10" height="10" fill="#D4AF37"></rect>
+        </svg>
+
+        <svg class="corner-ornament bottom-left" viewBox="0 0 100 100">
+          <path d="M 0,20 L 20,20 L 20,0 M 20,20 Q 50,50 80,80" fill="none" stroke="#D4AF37" stroke-width="2"></path>
+          <rect x="5" y="5" width="10" height="10" fill="#D4AF37"></rect>
+        </svg>
+
+        <svg class="corner-ornament bottom-right" viewBox="0 0 100 100">
+          <path d="M 0,20 L 20,20 L 20,0 M 20,20 Q 50,50 80,80" fill="none" stroke="#D4AF37" stroke-width="2"></path>
+          <rect x="5" y="5" width="10" height="10" fill="#D4AF37"></rect>
+        </svg>
+
+        <!-- Formal Certificate Body Text -->
+        <div class="cert-body-wrapper">
+          <span class="enterprise-brand-tag">TMS PRO ENTERPRISE</span>
+          <h1 class="cert-main-headline">CERTIFICATE OF COMPLETION</h1>
+
+          <p class="cert-italic-intro">This is to certify that</p>
+          <div class="script-student-name">{{ selectedCert()?.studentName }}</div>
+
+          <p class="cert-italic-intro">has successfully completed the requirements for the course</p>
+          <h2 class="course-name-headline">{{ selectedCert()?.courseCode }}: {{ selectedCert()?.courseTitle }}</h2>
+
+          <!-- Footer Metadata Grid -->
+          <div class="cert-footer-meta">
+            <!-- Issue Date & Grade -->
+            <div class="meta-column left">
+              <strong class="date-str">{{ selectedCert()?.issueDate | date:'mediumDate' }}</strong>
+              <div class="underline-bar"></div>
+              <span class="meta-label">Date of Issue</span>
+              <p class="grade-str">Final Grade: {{ selectedCert()?.grade }}</p>
+            </div>
+
+            <!-- Gold Star Emblem Seal -->
+            <div class="seal-column center">
+              <div class="seal-star-badge">
+                <span class="material-symbols-outlined icon-seal">military_tech</span>
+              </div>
+            </div>
+
+            <!-- Instructor Signature -->
+            <div class="meta-column right">
+              <svg class="sig-svg" viewBox="0 0 200 50">
+                <path d="M10,40 C 20,20 30,10 40,30 C 45,40 50,50 60,35 C 70,20 80,10 85,30 C 90,50 100,50 110,40 C 130,20 150,10 160,35 C 165,50 170,45 180,30" fill="none" stroke="#1a202c" stroke-width="2" stroke-linecap="round"></path>
+                <path d="M10,45 L 190,45" stroke="#cbd5e0" stroke-width="1"></path>
+              </svg>
+              <strong class="sig-name">{{ selectedCert()?.instructorName }}</strong>
+              <span class="meta-label">Lead Systems Architect</span>
+            </div>
+          </div>
+
+          <!-- Bottom Left QR Code & Verification Tag -->
+          <div class="qr-verify-bottom-box">
+            <div class="qr-icon-square">
+              <span class="material-symbols-outlined icon-qr">qr_code_2</span>
+            </div>
+            <div class="qr-meta">
+              <span class="verify-url">Verify at tms.pro/verify</span>
+              <code class="verify-code-str">{{ selectedCert()?.verificationCode }}</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="modal-action-bar">
+        <button type="button" class="btn-cancel-modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn-print-download" (click)="printCertificate()">
+          <span class="material-symbols-outlined">print</span> Print / Download PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

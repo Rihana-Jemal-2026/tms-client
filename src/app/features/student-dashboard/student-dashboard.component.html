@@ -1,59 +1,398 @@
-<div class="dashboard">
-  <div class="header-banner">
-    <div>
-      <h1>Welcome back, {{ studentName() }} 👋</h1>
-      <p class="subtitle">Managing course enrollments, real-time sync, and academic progress.</p>
+<div class="catalog-container">
+  <!-- Top Welcome & Metrics Bar -->
+  <div class="welcome-bar">
+    <div class="welcome-left">
+      <h1>Welcome back, {{ studentName() }}</h1>
+      <p class="subtitle">
+        @if (activeCoursesCount() === 0 && pendingCount() === 0) {
+          You have no active enrollments yet. Explore the course catalog below to enroll in your first class!
+        } @else {
+          You have {{ activeCoursesCount() }} active course(s) and {{ pendingCount() }} pending enrollment(s).
+        }
+      </p>
+    </div>
+
+    <div class="metrics-pills">
+      <div class="pill-metric">
+        <span class="label">Credits Earned</span>
+        <span class="val purple">{{ earnedCredits() }} CR</span>
+      </div>
+      <div class="pill-metric">
+        <span class="label">Status</span>
+        <span class="val green">{{ graduationStatus() }}</span>
+      </div>
+      <button class="btn-quick-reg" (click)="registerForClass()">
+        <span class="material-symbols-outlined text-xs">add_circle</span> +3 Credits
+      </button>
     </div>
   </div>
 
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="label">Credits Earned</div>
-      <div class="value purple">{{ earnedCredits() }} CR</div>
+  <!-- Key Metrics Row (4 Columns Grid) -->
+  <div class="kpi-metrics-grid">
+    <div class="glass-panel-box kpi-box">
+      <div>
+        <span class="kpi-title">Enrolled Courses</span>
+        <h2 class="kpi-num">{{ activeCoursesCount() }} Active</h2>
+      </div>
+      <div class="gauge-ring">
+        <svg viewBox="0 0 36 36" class="ring-svg">
+          <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="4"></path>
+          <path class="ring-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" [attr.stroke-dasharray]="trackProgressPercent() + ', 100'" stroke-width="4"></path>
+        </svg>
+        <span class="ring-val">{{ trackProgressPercent() }}%</span>
+      </div>
     </div>
-    <div class="metric-card">
-      <div class="label">Graduation Status</div>
-      <div class="value emerald">{{ graduationStatus() }}</div>
+
+    <div class="glass-panel-box kpi-box">
+      <div>
+        <span class="kpi-title">Hours Learned</span>
+        <h2 class="kpi-num">{{ hoursLearned() }} hrs</h2>
+      </div>
+      <div class="sparkline-box">
+        <svg viewBox="0 0 100 40" class="spark-svg">
+          <path d="M0,35 L20,20 L40,30 L60,10 L80,25 L100,5" fill="none" stroke="#6366f1" stroke-width="3"></path>
+        </svg>
+      </div>
     </div>
-    <div class="metric-card">
-      <div class="label">Pending Queue</div>
-      <div class="value cyan">{{ enrollmentStore.pendingCount() }} Active</div>
+
+    <div class="glass-panel-box kpi-box">
+      <div>
+        <span class="kpi-title">Pending Applications</span>
+        <h2 class="kpi-num">{{ pendingCount() }} Pending</h2>
+      </div>
+      <div class="pulse-icon-box">
+        <span class="material-symbols-outlined icon-amber animate-pulse">hourglass_empty</span>
+      </div>
+    </div>
+
+    <div class="glass-panel-box kpi-box">
+      <div>
+        <span class="kpi-title">Overall GPA</span>
+        <h2 class="kpi-num">{{ overallGpa() }}</h2>
+      </div>
+      <div class="star-badge-box">
+        <span class="material-symbols-outlined icon-cyan">star</span>
+      </div>
     </div>
   </div>
 
-  <div class="actions">
-    <button (click)="registerForClass()">
-      ⚡ Quick Register (+3 credits)
-    </button>
-    <a routerLink="/enroll" class="btn-enroll btn-secondary">Enrollment Form</a>
-    <a routerLink="/enrollments" class="btn-enroll btn-secondary">Instructor Queue</a>
-    <a routerLink="/instructor" class="btn-enroll btn-secondary">Command Center</a>
-    <a routerLink="/grade-submission" class="btn-enroll btn-secondary">Grade Submission (exhaustMap)</a>
+  <!-- Certification Track & Upcoming Schedule Hero Grid -->
+  <div class="track-schedule-grid">
+    <!-- Left Hero Column: Track & Recommended Courses -->
+    <div class="left-hero-col">
+      <!-- Certification Track Card -->
+      <div class="track-card glass-panel-box">
+        <div class="track-header">
+          <div>
+            <h2>Certification Track</h2>
+            <p class="track-subtitle">{{ activeCoursesCount() > 0 ? 'Advanced Cloud Architecture v4' : 'Get Started with Your Specialization' }}</p>
+          </div>
+          <span class="track-badge" [class.success]="activeCoursesCount() > 0">{{ activeCoursesCount() > 0 ? 'In Progress' : 'Not Started' }}</span>
+        </div>
+
+        <div class="track-body">
+          <div class="radial-gauge">
+            <svg class="gauge-svg" viewBox="0 0 120 120">
+              <circle class="gauge-bg" cx="60" cy="60" r="54"></circle>
+              <circle class="gauge-fill" cx="60" cy="60" r="54" [style.strokeDashoffset]="339.29 - (339.29 * trackProgressPercent() / 100)"></circle>
+            </svg>
+            <div class="gauge-text">
+              <span class="percentage">{{ trackProgressPercent() }}<small>%</small></span>
+              <span class="label">Complete</span>
+            </div>
+          </div>
+
+          <div class="track-stats">
+            <div class="stat-box">
+              <span class="stat-title">Modules Passed</span>
+              <strong class="stat-num">{{ modulesPassed() }}<small>/20</small></strong>
+            </div>
+            <div class="stat-box">
+              <span class="stat-title">Hours Logged</span>
+              <strong class="stat-num">{{ loggedHours() }}<small>h</small></strong>
+            </div>
+            <div class="milestone-box">
+              <span class="milestone-title">Next Milestone</span>
+              <div class="milestone-row">
+                <span class="material-symbols-outlined icon-cyan">flag</span>
+                <span class="milestone-name">{{ activeCoursesCount() > 0 ? 'Cloud Security Foundations Exam' : 'Enroll in a course to set milestone' }}</span>
+                <span class="milestone-due">{{ activeCoursesCount() > 0 ? 'In 3 Days' : 'Pending' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommended Courses Carousel Card -->
+      <div class="recommended-card glass-panel-box">
+        <div class="section-title-bar">
+          <h2><span class="material-symbols-outlined icon-cyan">auto_awesome</span> Recommended Courses</h2>
+          <span class="ai-badge">AI Picked</span>
+        </div>
+
+        <div class="recommended-grid">
+          <div class="rec-item-card border-tertiary">
+            <div class="rec-thumb bg-cyan">
+              <span class="material-symbols-outlined icon-lg">security</span>
+            </div>
+            <div class="rec-info">
+              <h3 class="rec-title">Advanced Cybersecurity</h3>
+              <p class="rec-desc">Master the art of digital defense, network security, and threat mitigation.</p>
+              <button class="btn-rec-details text-cyan">
+                View Details <span class="material-symbols-outlined icon-xs">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="rec-item-card border-indigo">
+            <div class="rec-thumb bg-indigo">
+              <span class="material-symbols-outlined icon-lg">psychology</span>
+            </div>
+            <div class="rec-info">
+              <h3 class="rec-title">AI & Machine Learning</h3>
+              <p class="rec-desc">Explore deep neural networks, model training, and predictive analytics.</p>
+              <button class="btn-rec-details text-indigo">
+                View Details <span class="material-symbols-outlined icon-xs">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Upcoming Schedule & Recent Activity Feed -->
+    <div class="right-hero-col">
+      <!-- Upcoming Schedule Timeline Card -->
+      <div class="schedule-card glass-panel-box">
+        <div class="schedule-header">
+          <h3>Upcoming Schedule</h3>
+          <span class="material-symbols-outlined icon-muted">calendar_today</span>
+        </div>
+
+        <div class="timeline-list">
+          <div class="timeline-item">
+            <div class="dot cyan"></div>
+            <span class="item-time text-cyan">Today, 14:00 - 15:30</span>
+            <p class="item-title">Live Q&A: Cloud Arch</p>
+            <span class="item-sub">Webex Room B</span>
+          </div>
+
+          <div class="timeline-item">
+            <div class="dot red"></div>
+            <span class="item-time text-red">Tomorrow, 09:00 - 12:00</span>
+            <p class="item-title">Workshop: Rust Basics</p>
+            <span class="item-sub">Virtual Lab 4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Feed Card -->
+      <div class="activity-card glass-panel-box">
+        <div class="schedule-header">
+          <h3>Recent Activity</h3>
+          <span class="material-symbols-outlined icon-indigo">notifications_active</span>
+        </div>
+
+        <div class="activity-feed">
+          <div class="feed-item">
+            <div class="feed-icon-box bg-indigo">
+              <span class="material-symbols-outlined icon-indigo">grade</span>
+            </div>
+            <div>
+              <p class="feed-text">Account created & activated</p>
+              <span class="feed-time">Just now</span>
+            </div>
+          </div>
+
+          <div *ngIf="pendingCount() > 0" class="feed-item">
+            <div class="feed-icon-box bg-cyan">
+              <span class="material-symbols-outlined icon-cyan">assignment</span>
+            </div>
+            <div>
+              <p class="feed-text">Enrollment application submitted</p>
+              <span class="feed-time">Pending review</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <h2>Available Course Catalog</h2>
+  <div class="catalog-layout">
+    <!-- Filter Sidebar -->
+    <aside class="filter-sidebar">
+      <div class="glass-panel-box">
+        <div class="filter-header">
+          <h3>Filters</h3>
+          <div class="gradient-divider"></div>
+        </div>
 
-  @if (coursesResource.isLoading()) {
-    <div class="spinner-box">
-      <div class="pulse-loader"></div>
-      <p>Fetching active course catalog...</p>
-    </div>
-  } @else {
-    <div class="grid">
-      @for (course of coursesResource.value() ?? []; track course.id) {
-        <tms-course-card
-          [course]="course"
-          (enrollClicked)="handleEnroll($event)"
-        />
-      } @empty {
-        <p class="empty-state">No courses are available this term.</p>
+        <!-- Search input mobile -->
+        <div class="search-box-mobile">
+          <span class="material-symbols-outlined">search</span>
+          <input 
+            type="text" 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)" 
+            placeholder="Search courses..." 
+          />
+        </div>
+
+        <!-- Categories -->
+        <div class="filter-group">
+          <h4 class="group-title">Categories</h4>
+          <label class="check-label">
+            <input type="checkbox" checked />
+            <span class="check-custom"></span>
+            <span>Data Engineering</span>
+          </label>
+          <label class="check-label">
+            <input type="checkbox" />
+            <span class="check-custom"></span>
+            <span>Cloud Architecture</span>
+          </label>
+          <label class="check-label">
+            <input type="checkbox" />
+            <span class="check-custom"></span>
+            <span>Cybersecurity</span>
+          </label>
+          <label class="check-label">
+            <input type="checkbox" />
+            <span class="check-custom"></span>
+            <span>Machine Learning</span>
+          </label>
+        </div>
+
+        <!-- Difficulty -->
+        <div class="filter-group">
+          <h4 class="group-title">Difficulty Level</h4>
+          <div class="pills-group">
+            <button class="pill-btn active">Beginner</button>
+            <button class="pill-btn">Intermediate</button>
+            <button class="pill-btn">Advanced</button>
+          </div>
+        </div>
+
+        <!-- Duration -->
+        <div class="filter-group">
+          <h4 class="group-title">Max Duration</h4>
+          <input type="range" min="1" max="40" value="20" class="range-slider" />
+          <div class="range-labels">
+            <span>1h</span>
+            <span>40h+</span>
+          </div>
+        </div>
+
+        <button class="btn-reset-filters" (click)="resetFilters()">Reset Filters</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="catalog-main">
+      <div class="catalog-top-bar">
+        <div>
+          <h2>Available Course Catalog</h2>
+          <span class="results-count">Showing {{ filteredCourses().length }} Available Courses</span>
+        </div>
+
+        <div class="search-input-wrapper">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input 
+            type="text" 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)" 
+            placeholder="Search course title or code..." 
+          />
+        </div>
+      </div>
+
+      <!-- Enrollment Feedback Notification -->
+      @if (enrollmentMessage()) {
+        <div class="enrollment-alert-toast">
+          <span class="material-symbols-outlined icon-sm">check_circle</span>
+          <span>{{ enrollmentMessage() }}</span>
+        </div>
       }
-    </div>
-  }
 
-  @if (selectedCourse(); as picked) {
-    <div class="selection-hint" role="status">
-      🚀 Last enrollment request queued: <strong>{{ picked.title }}</strong> ({{ picked.code }})
-    </div>
-  }
+      <!-- Selected Course Hint Toast -->
+      @if (selectedCourse(); as picked) {
+        <div class="selected-hint">
+          <span class="material-symbols-outlined icon-sm">assignment_turned_in</span>
+          <span>Enrollment active for: <strong>{{ picked.title }}</strong> ({{ picked.code }}).</span>
+          <a routerLink="/enroll" class="link-submit">Customize in Application Form →</a>
+        </div>
+      }
+
+      <!-- Loading Spinner -->
+      <div *ngIf="coursesResource.isLoading()" class="loading-box">
+        <div class="spinner-pulse"></div>
+        <p>Fetching active course catalog...</p>
+      </div>
+
+      <!-- Course Grid -->
+      <div *ngIf="!coursesResource.isLoading()" class="course-grid">
+        <article *ngFor="let course of filteredCourses()" class="course-card-glass">
+          <div class="card-thumb">
+            <div class="thumb-badge">NEW</div>
+            <div class="time-tag">
+              <span class="material-symbols-outlined icon-xs">schedule</span> 12h
+            </div>
+          </div>
+
+          <div class="card-content">
+            <div class="category-tag">{{ course.code.slice(0, 2) === 'CS' ? 'Computer Science' : 'Software Engineering' }}</div>
+            <h3 class="course-title">{{ course.title }}</h3>
+            <p class="course-code-sub">Course Code: <strong>{{ course.code }}</strong></p>
+
+            <!-- Capacity Progress Bar -->
+            <div class="capacity-box">
+              <div class="capacity-label">
+                <span>Seats Filled</span>
+                <strong>{{ course.enrollmentCount }} / {{ course.maxCapacity }} Seats</strong>
+              </div>
+              <div class="capacity-track">
+                <div 
+                  class="capacity-fill" 
+                  [style.width.%]="(course.enrollmentCount / course.maxCapacity) * 100"
+                  [class.full]="course.enrollmentCount >= course.maxCapacity"
+                ></div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div class="rating-box">
+                <span class="material-symbols-outlined star-icon">star</span>
+                <span class="rating-score">4.9 <span class="review-count">(128)</span></span>
+              </div>
+
+              <button 
+                class="btn-enroll-action" 
+                (click)="handleEnroll(course)"
+                [disabled]="course.enrollmentCount >= course.maxCapacity || isEnrolledInCourse(course)"
+                [class.enrolled-active]="isEnrolledInCourse(course)"
+              >
+                {{ isEnrolledInCourse(course) ? 'Enrolled' : (course.enrollmentCount >= course.maxCapacity ? 'Capacity Full' : 'Enroll Now →') }}
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <div *ngIf="filteredCourses().length === 0" class="empty-catalog">
+          <span class="material-symbols-outlined empty-icon">menu_book</span>
+          <h3>No Courses Found</h3>
+          <p>Try adjusting your search query or reset filters.</p>
+        </div>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="pagination-bar">
+        <button class="page-btn"><span class="material-symbols-outlined">chevron_left</span></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <span class="dots">...</span>
+        <button class="page-btn"><span class="material-symbols-outlined">chevron_right</span></button>
+      </div>
+    </main>
+  </div>
 </div>

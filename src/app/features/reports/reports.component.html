@@ -1,0 +1,217 @@
+<div class="reports-hub-container">
+  <!-- Ambient Background Glows -->
+  <div class="glow-bg-top-left"></div>
+  <div class="glow-bg-bottom-right"></div>
+
+  <!-- Header Section -->
+  <header class="reports-header-bar">
+    <div class="header-titles">
+      <div class="admin-view-tag">
+        <span class="material-symbols-outlined icon-analytics">analytics</span>
+        <span class="lbl-admin">Admin View</span>
+      </div>
+      <h1 class="main-title">
+        System Reports <br />
+        <span class="title-sub-text">&amp; Institutional Analytics</span>
+      </h1>
+    </div>
+
+    <!-- Export Action Buttons -->
+    <div class="export-btns-row">
+      <button type="button" class="btn-export-glass" (click)="exportEnrollmentReportCsv()">
+        <span class="material-symbols-outlined">download</span>
+        Export Enrollment CSV
+      </button>
+
+      <button type="button" class="btn-export-primary" (click)="exportGpaReportCsv()">
+        <span class="material-symbols-outlined">bar_chart</span>
+        Export GPA CSV
+      </button>
+    </div>
+  </header>
+
+  <!-- Notification Banner -->
+  <div *ngIf="remindStatus()" class="remind-status-banner">
+    <span class="material-symbols-outlined icon-info">info</span>
+    <span>{{ remindStatus() }}</span>
+  </div>
+
+  <!-- Key Metrics Row (3 KPI Cards) -->
+  <section class="metrics-kpi-grid">
+    <!-- Active Honors -->
+    <article class="metric-card-glass">
+      <div class="card-inner-glow"></div>
+      <div class="card-header-row">
+        <span class="card-label">Active Honors</span>
+        <div class="icon-circle-indigo">
+          <span class="material-symbols-outlined icon-gold">military_tech</span>
+        </div>
+      </div>
+      <div class="card-value-row">
+        <strong class="metric-num">{{ activeHonorsCount() }}</strong>
+        <span class="pill-gpa">GPA &ge; 3.0</span>
+      </div>
+      <p class="trend-note">
+        <span class="material-symbols-outlined icon-trend">trending_up</span>
+        +2 from last term
+      </p>
+    </article>
+
+    <!-- Active Courses Tracked -->
+    <article class="metric-card-glass">
+      <div class="card-inner-glow"></div>
+      <div class="card-header-row">
+        <span class="card-label">Active Courses Tracked</span>
+        <div class="icon-circle-cyan">
+          <span class="material-symbols-outlined icon-cyan">library_books</span>
+        </div>
+      </div>
+      <div class="card-value-row">
+        <strong class="metric-num">{{ coursesByEnrollment().length }}</strong>
+      </div>
+      <div class="mini-progress-track">
+        <div class="fill-track-cyan" style="width: 100%"></div>
+      </div>
+      <p class="capacity-note">100% Core Capacity</p>
+    </article>
+
+    <!-- Platform Avg GPA -->
+    <article class="metric-card-glass">
+      <div class="card-inner-glow"></div>
+      <div class="card-header-row">
+        <span class="card-label">Platform Avg GPA</span>
+        <div class="icon-circle-emerald">
+          <span class="material-symbols-outlined icon-emerald">school</span>
+        </div>
+      </div>
+      <div class="card-value-row">
+        <strong class="metric-num">3.73</strong>
+        <span class="pill-top">Top 15%</span>
+      </div>
+      <!-- Sparkline Chart -->
+      <div class="sparkline-bars-row">
+        <div class="spark-bar h-30"></div>
+        <div class="spark-bar h-40"></div>
+        <div class="spark-bar h-35"></div>
+        <div class="spark-bar h-60"></div>
+        <div class="spark-bar h-80"></div>
+        <div class="spark-bar h-95 active"></div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Main Content Analytics Grid (2 Columns) -->
+  <section class="analytics-main-grid">
+    <!-- Left Card: Course Enrollment Volume -->
+    <div class="analytics-card-glass">
+      <div class="card-title-bar">
+        <h2>Course Enrollment Volume</h2>
+        <span class="material-symbols-outlined icon-more">more_horiz</span>
+      </div>
+
+      <div class="enrollment-list-rows">
+        <div *ngFor="let item of coursesByEnrollment(); let i = index" class="enrollment-row-item">
+          <div class="item-meta">
+            <div>
+              <strong class="course-name">{{ item.title }}</strong>
+            </div>
+            <div class="enrollment-count-ratio">
+              <strong class="count-val">{{ item.enrollmentCount }}</strong>
+              <span class="denom-val">/40</span>
+            </div>
+          </div>
+          <div class="progress-bar-track">
+            <div 
+              class="progress-bar-fill" 
+              [style.width.%]="(item.enrollmentCount / 40) * 100"
+              [class.indigo]="i === 0"
+              [class.cyan]="i === 1"
+              [class.secondary]="i === 2"
+              [class.muted]="i === 3"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Card: Average GPA Per Course -->
+    <div class="analytics-card-glass">
+      <div class="card-title-bar">
+        <h2>Average GPA Per Course</h2>
+        <div class="scale-label">
+          <span class="dot-green"></span>
+          <span>4.0 Scale</span>
+        </div>
+      </div>
+
+      <div class="gpa-rows-wrapper">
+        <!-- Vertical Grid Guide Lines -->
+        <div class="vertical-grid-lines">
+          <div class="v-line"></div>
+          <div class="v-line"></div>
+          <div class="v-line"></div>
+          <div class="v-line"></div>
+          <div class="v-line"></div>
+        </div>
+
+        <!-- GPA Rows -->
+        <div *ngFor="let item of averageGpaPerCourse()" class="gpa-bar-row">
+          <div class="gpa-left-label">
+            <strong class="course-code-str">{{ item.course }}</strong>
+            <span class="gpa-badge-pill">{{ item.averageGPA.toFixed(2) }}</span>
+          </div>
+          <div class="gpa-track-container">
+            <div 
+              class="gpa-fill-bar" 
+              [style.width.%]="(item.averageGPA / 4.0) * 100"
+              [class.emerald]="item.averageGPA >= 3.5"
+              [class.cyan]="item.averageGPA < 3.5"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Axis Scale Labels -->
+        <div class="axis-scale-labels">
+          <span>0.0</span>
+          <span>1.0</span>
+          <span>2.0</span>
+          <span>3.0</span>
+          <span>4.0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Section: Unenrolled Students Assistance -->
+  <section class="assistance-section">
+    <div class="assistance-alert-card glass-panel-box">
+      <div class="assistance-header-row">
+        <div>
+          <div class="alert-title-flex">
+            <span class="material-symbols-outlined icon-warn-red">warning</span>
+            <h2>Unenrolled Students Assistance</h2>
+          </div>
+          <p class="assistance-desc">These students have registered accounts but zero active course enrollments for the current term.</p>
+        </div>
+
+        <button type="button" class="btn-remind-all" (click)="remindAll()">
+          Remind All
+        </button>
+      </div>
+
+      <!-- Student Chips Row -->
+      <div class="chips-flex-row">
+        <div *ngFor="let student of unenrolledStudentChips()" class="student-chip-card">
+          <img [src]="student.avatar" [alt]="student.name" class="chip-avatar" />
+          <div class="chip-info">
+            <strong class="chip-name">{{ student.name }}</strong>
+            <span class="chip-status">{{ student.statusText }}</span>
+          </div>
+          <button type="button" class="btn-chip-mail" (click)="remindStudent(student.name)" title="Send Reminder">
+            <span class="material-symbols-outlined">mail</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

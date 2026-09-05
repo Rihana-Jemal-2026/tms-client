@@ -1,51 +1,255 @@
-<div class="enrollment-form-container">
-  <h2>Course Enrollment</h2>
-
-  @if (submitted()) {
-    <div class="success">
-      Enrollment submitted. Check the console for the payload.
+<div class="enrollment-wizard-container">
+  <!-- Stepper Header -->
+  <div class="stepper-header">
+    <div class="stepper-line">
+      <div 
+        class="progress-fill" 
+        [style.width.%]="((currentStep() - 1) / 2) * 100"
+      ></div>
     </div>
-  } @else {
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <label for="studentId">Student ID</label>
-      <input
-        id="studentId"
-        formControlName="studentId"
-        placeholder="e.g. STU-1234"
-      />
-      @if (form.controls.studentId.touched && form.controls.studentId.invalid) {
-        <span class="error">Enter a valid Student ID (format: STU-0000)</span>
-      }
 
-      <label for="courseId">Course ID</label>
-      <input
-        id="courseId"
-        formControlName="courseId"
-        placeholder="e.g. 1 (TMS course primary key)"
-      />
-      @if (form.controls.courseId.touched && form.controls.courseId.invalid) {
-        <span class="error">Course ID is required</span>
-      }
+    <!-- Step 1 Indicator -->
+    <div class="step-indicator" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
+      <div class="circle">
+        <span *ngIf="currentStep() <= 1">1</span>
+        <span *ngIf="currentStep() > 1" class="material-symbols-outlined icon-check">check</span>
+      </div>
+      <span class="step-label">Select Course</span>
+    </div>
 
-      <label for="term">Term</label>
-      <input id="term" formControlName="term" />
+    <!-- Step 2 Indicator -->
+    <div class="step-indicator" [class.active]="currentStep() === 2" [class.completed]="currentStep() > 2">
+      <div class="circle">
+        <span *ngIf="currentStep() <= 2">2</span>
+        <span *ngIf="currentStep() > 2" class="material-symbols-outlined icon-check">check</span>
+      </div>
+      <span class="step-label">Details</span>
+    </div>
 
-      <label for="notes">Notes (optional)</label>
-      <textarea id="notes" formControlName="notes"></textarea>
+    <!-- Step 3 Indicator -->
+    <div class="step-indicator" [class.active]="currentStep() === 3">
+      <div class="circle">
+        <span>3</span>
+      </div>
+      <span class="step-label">Review</span>
+    </div>
+  </div>
 
-      <h3>Backup Courses</h3>
-      @for (backup of backups.controls; track $index) {
-        <div class="backup-row">
-          <input
-            [formControl]="backup"
-            [placeholder]="'Backup course ' + ($index + 1)"
-          />
-          <button type="button" (click)="removeBackup($index)">Remove</button>
+  <!-- Main Glassmorphic Form Card -->
+  <div class="wizard-card-glass">
+    <!-- Success Banner -->
+    <div *ngIf="submitted()" class="success-screen">
+      <div class="success-icon-box">
+        <span class="material-symbols-outlined icon-lg">verified</span>
+      </div>
+      <h2>Application Submitted Successfully!</h2>
+      <p class="subtitle">Your enrollment request for <strong>{{ form.controls.courseCode.value }}</strong> has been transmitted to the Instructor Queue.</p>
+      
+      <div class="success-actions">
+        <button class="btn-primary" (click)="resetForm()">Submit Another Application</button>
+        <a routerLink="/dashboard" class="btn-secondary">Return to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Active Form Steps -->
+    <form *ngIf="!submitted()" [formGroup]="form" (ngSubmit)="submit()" class="wizard-form">
+      <!-- STEP 1: SELECT COURSE SEGMENT -->
+      <div *ngIf="currentStep() === 1" class="step-pane">
+        <div class="pane-header">
+          <span class="material-symbols-outlined icon-primary">school</span>
+          <h2>Select Course Segment</h2>
         </div>
-      }
-      <button type="button" class="add-btn" (click)="addBackup()">+ Add Backup Course</button>
 
-      <button type="submit" [disabled]="form.invalid">Confirm Enrollment</button>
+        <div class="search-combobox-wrapper">
+          <label class="input-label">Search Catalog</label>
+          <div class="search-input-box">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input
+              type="text"
+              [value]="searchQuery()"
+              (input)="filterCourses($any($event.target).value)"
+              placeholder="Type course code or name..."
+            />
+            <span class="shortcut-tag">CMD+K</span>
+          </div>
+
+          <!-- Combobox Dropdown Results -->
+          <div class="results-dropdown">
+            <button
+              type="button"
+              *ngFor="let c of filteredCourses()"
+              class="result-item-btn"
+              (click)="selectCourse(c)"
+            >
+              <div class="item-info">
+                <strong class="course-code-title">{{ c.code }}: {{ c.name }}</strong>
+                <span class="instructor-sub">{{ c.instructor }} • {{ c.tier }}</span>
+              </div>
+
+              <span 
+                class="seat-tag" 
+                [class.urgent]="c.isUrgent"
+                [class.waitlist]="c.isWaitlist"
+              >
+                {{ c.seatsText }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: CANDIDATE PROFILING -->
+      <div *ngIf="currentStep() === 2" class="step-pane">
+        <div class="pane-header">
+          <span class="material-symbols-outlined icon-primary">badge</span>
+          <h2>Candidate Profiling</h2>
+        </div>
+
+        <div class="form-grid-two">
+          <div class="form-group">
+            <label for="studentId">Candidate ID</label>
+            <input
+              id="studentId"
+              type="text"
+              formControlName="studentId"
+              placeholder="STU-8291"
+            />
+            <span *ngIf="form.controls.studentId.touched && form.controls.studentId.invalid" class="error-msg">
+              Format: STU-0000 required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="legalName">Legal Name</label>
+            <input
+              id="legalName"
+              type="text"
+              formControlName="legalName"
+              placeholder="Jane Doe"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid-two items-center">
+          <div class="form-group">
+            <label for="division">Division / Major</label>
+            <select id="division" formControlName="division">
+              <option value="Core Systems Engineering">Core Systems Engineering</option>
+              <option value="Cyber Security Operations">Cyber Security Operations</option>
+              <option value="Data Science & ML">Data Science & ML</option>
+            </select>
+          </div>
+
+          <div class="toggle-card">
+            <span class="toggle-label">Prerequisites Verified</span>
+            <label class="switch-box">
+              <input type="checkbox" formControlName="prereqsVerified" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="justification">Justification for Enrollment</label>
+            <span class="char-count">{{ form.controls.justification.value?.length || 0 }}/500</span>
+          </div>
+          <textarea
+            id="justification"
+            formControlName="justification"
+            rows="3"
+            placeholder="Briefly detail how this module aligns with quarterly objectives..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 3: FINAL AUTHORIZATION & REVIEW -->
+      <div *ngIf="currentStep() === 3" class="step-pane">
+        <div class="pane-header">
+          <span class="material-symbols-outlined icon-primary">fact_check</span>
+          <h2>Final Authorization</h2>
+        </div>
+
+        <div class="review-summary-card">
+          <div class="summary-row border-bottom">
+            <span class="lbl">Selected Module</span>
+            <strong class="val-highlight">{{ form.controls.courseCode.value }}: {{ form.controls.courseName.value }}</strong>
+          </div>
+
+          <div class="summary-grid-four border-bottom">
+            <div class="sum-box">
+              <span class="lbl">Candidate ID</span>
+              <strong class="val font-mono">{{ form.controls.studentId.value }}</strong>
+            </div>
+            <div class="sum-box">
+              <span class="lbl">Legal Name</span>
+              <strong class="val">{{ form.controls.legalName.value }}</strong>
+            </div>
+            <div class="sum-box">
+              <span class="lbl">Division</span>
+              <strong class="val">{{ form.controls.division.value }}</strong>
+            </div>
+            <div class="sum-box">
+              <span class="lbl">Prerequisites</span>
+              <strong class="val text-cyan">
+                <span class="material-symbols-outlined icon-xs">check_circle</span> Verified
+              </strong>
+            </div>
+          </div>
+
+          <div class="summary-row">
+            <span class="lbl">Justification Excerpt</span>
+            <p class="excerpt">"{{ form.controls.justification.value }}"</p>
+          </div>
+        </div>
+
+        <div class="terms-card">
+          <label class="terms-label">
+            <input type="checkbox" formControlName="termsAccepted" />
+            <span class="check-custom"></span>
+            <span>I affirm that the provided information is accurate and I agree to the Enterprise Data Handling Protocol and Training Commitment Clause.</span>
+          </label>
+        </div>
+      </div>
     </form>
-  }
+  </div>
+
+  <!-- Sticky Bottom Action Footer -->
+  <div *ngIf="!submitted()" class="sticky-action-footer">
+    <button
+      type="button"
+      *ngIf="currentStep() > 1"
+      class="btn-back"
+      (click)="prevStep()"
+    >
+      <span class="material-symbols-outlined">arrow_back</span> Back
+    </button>
+
+    <button
+      type="button"
+      class="btn-clear"
+      (click)="resetForm()"
+    >
+      Clear Draft
+    </button>
+
+    <button
+      type="button"
+      *ngIf="currentStep() < 3"
+      class="btn-next"
+      (click)="nextStep()"
+    >
+      Continue <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+
+    <button
+      type="button"
+      *ngIf="currentStep() === 3"
+      class="btn-submit-commit"
+      [disabled]="form.invalid || isSubmitting()"
+      (click)="submit()"
+    >
+      {{ isSubmitting() ? 'Submitting Application...' : 'Submit Enrollment Application' }}
+    </button>
+  </div>
 </div>

@@ -1,0 +1,42 @@
+<div class="unauthorized-page-container">
+  <!-- Ambient Background Glows -->
+  <div class="glow-bg-left-red"></div>
+  <div class="glow-bg-right-indigo"></div>
+
+  <!-- Glassmorphic Central Card -->
+  <div class="unauthorized-card-glass">
+    <!-- Top Neon Red Edge Line -->
+    <div class="neon-red-edge"></div>
+
+    <!-- Holographic Lock Icon with Scan Line -->
+    <div class="hologram-lock-wrapper">
+      <span class="material-symbols-outlined icon-layer-red">lock</span>
+      <span class="material-symbols-outlined icon-layer-cyan">lock</span>
+      <span class="material-symbols-outlined icon-layer-main">lock</span>
+      <div class="scan-line-effect"></div>
+    </div>
+
+    <!-- Terminal Mono Tag -->
+    <div class="terminal-error-tag">
+      <span class="pulse-red-dot"></span>
+      <span>ERROR 403: INSUFFICIENT PERMISSIONS</span>
+    </div>
+
+    <!-- Main Headlines -->
+    <h1 class="card-title">Instructor Clearance Required</h1>
+    <p class="card-description">
+      Your current digital signature does not have the administrative clearance required to access this encrypted node. Please contact your system administrator or return to your secure terminal.
+    </p>
+
+    <!-- Action Button -->
+    <a routerLink="/dashboard" class="btn-return-dashboard">
+      <span class="material-symbols-outlined icon-arrow">arrow_back</span>
+      Return to Student Dashboard
+    </a>
+
+    <!-- Decorative Data String -->
+    <div class="sec-protocol-tag">
+      [ SEC_PROTOCOL: DENIED // NODE: 492.ABX ]
+    </div>
+  </div>
+</div>

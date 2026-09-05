@@ -10,6 +10,7 @@ import {
   withEntities,
   setAllEntities,
   updateEntity,
+  addEntity,
 } from "@ngrx/signals/entities";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { pipe, concatMap, switchMap, tap, catchError, EMPTY } from "rxjs";
@@ -27,6 +28,9 @@ export const EnrollmentStore = signalStore(
   withComputed((store) => ({
     pendingCount: computed(
       () => store.entities().filter((e) => e.status === "Pending").length,
+    ),
+    approvedCount: computed(
+      () => store.entities().filter((e) => e.status === "Approved").length,
     ),
   })),
   withMethods((store) => {
@@ -126,6 +130,26 @@ export const EnrollmentStore = signalStore(
           ),
         ),
       ),
+      // Add or create a new student enrollment
+      addEnrollment: (enrollment: Enrollment) => {
+        patchState(store, addEntity(enrollment));
+        api.create(enrollment).subscribe();
+      },
+      // Reject Enrollment
+      rejectEnrollment: (id: string) => {
+        const found = store
+          .entities()
+          .find(
+            (e) =>
+              String(e.id) === String(id) ||
+              String(e.studentId) === String(id),
+          );
+        const entityId = found ? found.id : id;
+        patchState(
+          store,
+          updateEntity({ id: entityId, changes: { status: "Rejected" } }),
+        );
+      },
     };
   }),
 );

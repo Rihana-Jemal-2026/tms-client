@@ -10,14 +10,30 @@ export const routes: Routes = [
       ),
   },
   {
+    path: "dashboard",
+    loadComponent: () =>
+      import(
+        "./features/student-dashboard/student-dashboard.component"
+      ).then((m) => m.StudentDashboardComponent),
+  },
+  {
+    path: "student",
+    loadComponent: () =>
+      import(
+        "./features/student-dashboard/student-dashboard.component"
+      ).then((m) => m.StudentDashboardComponent),
+  },
+  {
     path: "command-center",
+    canActivate: [roleGuard("Instructor")],
     loadComponent: () =>
       import(
         "./features/instructor-dashboard/instructor-dashboard.component"
       ).then((m) => m.InstructorDashboardComponent),
   },
   {
-    path: "dashboard",
+    path: "instructor",
+    canActivate: [roleGuard("Instructor")],
     loadComponent: () =>
       import(
         "./features/instructor-dashboard/instructor-dashboard.component"
@@ -45,20 +61,34 @@ export const routes: Routes = [
       ),
   },
   {
-    path: "instructor",
-    canActivate: [roleGuard("Instructor")],
-    loadComponent: () =>
-      import(
-        "./features/instructor-dashboard/instructor-dashboard.component"
-      ).then((m) => m.InstructorDashboardComponent),
-  },
-  {
     path: "grade-submission",
     canActivate: [roleGuard("Instructor")],
     loadComponent: () =>
       import(
         "./features/grade-submission/grade-submission.component"
       ).then((m) => m.GradeSubmissionComponent),
+  },
+  {
+    path: "certificates",
+    loadComponent: () =>
+      import("./features/certificates/certificates.component").then(
+        (m) => m.CertificatesComponent
+      ),
+  },
+  {
+    path: "reports",
+    canActivate: [roleGuard("Instructor")],
+    loadComponent: () =>
+      import("./features/reports/reports.component").then(
+        (m) => m.ReportsComponent
+      ),
+  },
+  {
+    path: "unauthorized",
+    loadComponent: () =>
+      import("./features/unauthorized/unauthorized.component").then(
+        (m) => m.UnauthorizedComponent,
+      ),
   },
   {
     path: "",

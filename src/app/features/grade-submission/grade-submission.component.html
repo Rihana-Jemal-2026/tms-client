@@ -1,67 +1,260 @@
-<div class="grade-submission-wrapper">
-  <mat-card class="grade-card shadow-2xl">
-    <mat-card-header class="card-header">
-      <div class="header-icon">
-        <mat-icon>school</mat-icon>
+<div class="grade-matrix-container">
+  <!-- Header Section -->
+  <section class="matrix-header-section">
+    <!-- Active Course Session Selector Dropdown -->
+    <div class="session-selector-wrapper">
+      <button 
+        type="button" 
+        class="btn-session-select glass-panel-box" 
+        (click)="toggleDropdown()"
+      >
+        <div class="session-meta">
+          <span class="lbl-small">Active Session</span>
+          <strong class="session-title">{{ activeSession() }}</strong>
+        </div>
+        <span class="material-symbols-outlined icon-chevron" [class.rotated]="isDropdownOpen()">
+          expand_more
+        </span>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="isDropdownOpen()" class="session-dropdown-menu">
+        <ul>
+          <li *ngFor="let session of availableSessions">
+            <button 
+              type="button" 
+              class="dropdown-item-btn" 
+              [class.active]="session === activeSession()"
+              (click)="selectSession(session)"
+            >
+              <span>{{ session }}</span>
+              <span *ngIf="session === activeSession()" class="pulse-dot-cyan"></span>
+            </button>
+          </li>
+        </ul>
       </div>
-      <div>
-        <mat-card-title class="title">Grade Submission Form</mat-card-title>
-        <mat-card-subtitle class="subtitle">Instructor Midterm Grading</mat-card-subtitle>
+    </div>
+
+    <!-- Metrics Row -->
+    <div class="metrics-row-card glass-panel-box">
+      <!-- Total Enrolled -->
+      <div class="metric-mini-box">
+        <div class="icon-box-indigo">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
+        <div class="meta-content">
+          <span class="lbl-text">Total Enrolled</span>
+          <strong class="val-text">{{ totalEnrolled() }}</strong>
+        </div>
       </div>
-    </mat-card-header>
 
-    <form [formGroup]="gradeForm" (ngSubmit)="onSubmit()">
-      <mat-card-content class="card-content">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Student ID</mat-label>
-          <input matInput type="number" formControlName="studentId" placeholder="e.g. 101" />
-          @if (gradeForm.controls.studentId.hasError('required')) {
-            <mat-error>Student ID is required</mat-error>
-          }
-        </mat-form-field>
+      <!-- Graded Progress -->
+      <div class="metric-mini-box progress-box">
+        <div class="progress-meta">
+          <span class="lbl-text">Graded</span>
+          <span class="val-ratio">
+            <strong>{{ gradedCount() }}</strong><small>/{{ totalEnrolled() }}</small>
+          </span>
+        </div>
+        <div class="track-bar">
+          <div class="fill-bar" style="width: 80%"></div>
+        </div>
+      </div>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Course ID</mat-label>
-          <input matInput type="number" formControlName="courseId" placeholder="e.g. 302" />
-          @if (gradeForm.controls.courseId.hasError('required')) {
-            <mat-error>Course ID is required</mat-error>
-          }
-        </mat-form-field>
+      <!-- Unassigned Alert -->
+      <div class="metric-mini-box alert-box">
+        <span class="material-symbols-outlined icon-warn">warning</span>
+        <div class="meta-content">
+          <span class="lbl-text">Unassigned</span>
+          <strong class="val-text-warn">{{ unassignedCount() }}</strong>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Score (0-100)</mat-label>
-          <input matInput type="number" formControlName="score" placeholder="0 - 100" />
-          @if (gradeForm.controls.score.hasError('min') || gradeForm.controls.score.hasError('max')) {
-            <mat-error>Score must be between 0 and 100</mat-error>
-          }
-        </mat-form-field>
+  <!-- Status Notification -->
+  <div *ngIf="publishMessage()" class="status-banner-pill">
+    <span class="material-symbols-outlined icon-info">info</span>
+    <span>{{ publishMessage() }}</span>
+  </div>
 
-        @if (isSubmitting) {
-          <div class="spinner-container">
-            <mat-spinner diameter="36"></mat-spinner>
-            <span>Guarding stream with exhaustMap...</span>
-          </div>
-        }
+  <!-- Main Content: Data Matrix Table -->
+  <section class="matrix-table-section">
+    <div class="glass-matrix-card">
+      <div class="table-scroll-wrapper">
+        <table class="matrix-data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Student ID</th>
+              <th class="w-48">Attendance</th>
+              <th class="w-32">Midterm</th>
+              <th class="w-40">Final Grade</th>
+              <th>Feedback Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of rows()" class="matrix-row">
+              <!-- Student Meta -->
+              <td>
+                <div class="student-cell">
+                  <div class="avatar-box">
+                    <img *ngIf="row.avatar" [src]="row.avatar" [alt]="row.studentName" class="avatar-img" />
+                    <div *ngIf="!row.avatar" class="avatar-fallback">DC</div>
+                    <span class="online-dot"></span>
+                  </div>
+                  <div>
+                    <strong class="student-name">{{ row.studentName }}</strong>
+                    <span class="section-tag">{{ row.section }}</span>
+                  </div>
+                </div>
+              </td>
 
-        @if (submissionStatus) {
-          <div class="status-banner" [class.success]="isSuccess">
-            <mat-icon>{{ isSuccess ? 'check_circle' : 'info' }}</mat-icon>
-            <span>{{ submissionStatus }}</span>
-          </div>
-        }
-      </mat-card-content>
+              <!-- Student ID -->
+              <td class="font-mono text-muted">{{ row.studentId }}</td>
 
-      <mat-card-actions class="card-actions">
-        <button
-          mat-raised-button
-          color="primary"
-          type="submit"
-          [disabled]="gradeForm.invalid || isSubmitting"
-          class="submit-btn"
-        >
-          Submit Final Grade
+              <!-- Attendance Bar -->
+              <td>
+                <div class="attendance-cell">
+                  <span class="pct-text" [class.warn]="row.attendancePct < 75">{{ row.attendancePct }}%</span>
+                  <div class="att-track">
+                    <div 
+                      class="att-fill" 
+                      [style.width.%]="row.attendancePct"
+                      [class.warn]="row.attendancePct < 75"
+                    ></div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Midterm Score Input with Automatic Grade Calculation -->
+              <td>
+                <div class="score-input-container">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    [ngModel]="row.midtermScore"
+                    (ngModelChange)="onScoreChange(row, $event)"
+                    class="score-input"
+                    [class.warn]="row.midtermScore < 70"
+                    placeholder="0-100"
+                  />
+                  <span *ngIf="row.finalGrade !== 'Unassigned'" class="auto-calc-badge" title="Auto calculated from score">
+                    Auto
+                  </span>
+                </div>
+              </td>
+
+              <!-- Final Grade Dropdown -->
+              <td class="select-cell-td">
+                <select 
+                  [(ngModel)]="row.finalGrade" 
+                  class="grade-select"
+                  [class.unassigned]="row.finalGrade === 'Unassigned'"
+                >
+                  <option value="Unassigned">Unassigned</option>
+                  <option value="A+">A+</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                  <option value="F">F</option>
+                </select>
+                <span class="material-symbols-outlined select-chevron">expand_more</span>
+              </td>
+
+              <!-- Feedback Note Text Input -->
+              <td>
+                <input
+                  type="text"
+                  [(ngModel)]="row.feedbackNote"
+                  placeholder="Add note..."
+                  class="note-input"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Preview Summary Modal -->
+  <div *ngIf="isPreviewOpen()" class="preview-modal-backdrop" (click)="togglePreview()">
+    <div class="preview-modal-glass" (click)="$event.stopPropagation()">
+      <div class="preview-modal-header">
+        <div>
+          <h2>Grade Matrix Preview Summary</h2>
+          <p class="subtitle">Cohort: {{ activeSession() }} • {{ rows().length }} Students Evaluated</p>
+        </div>
+        <button class="btn-close-modal" (click)="togglePreview()">
+          <span class="material-symbols-outlined">close</span>
         </button>
-      </mat-card-actions>
-    </form>
-  </mat-card>
+      </div>
+
+      <div class="preview-table-wrapper">
+        <table class="preview-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Student ID</th>
+              <th>Numeric Score</th>
+              <th>Calculated Grade</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of rows()">
+              <td><strong>{{ r.studentName }}</strong></td>
+              <td class="font-mono">{{ r.studentId }}</td>
+              <td><span class="score-badge">{{ r.midtermScore }} / 100</span></td>
+              <td>
+                <span class="grade-pill" [class.excellent]="r.finalGrade === 'A+' || r.finalGrade === 'A'">
+                  {{ r.finalGrade }}
+                </span>
+              </td>
+              <td class="text-muted">{{ r.feedbackNote || 'No specific note added.' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="preview-modal-footer">
+        <button class="btn-cancel" (click)="togglePreview()">Back to Editing</button>
+        <button class="btn-batch-publish" [disabled]="isSubmitting()" (click)="publishAllGrades()">
+          Confirm & Batch Publish All
+          <span class="material-symbols-outlined icon-bolt">bolt</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Footer Actions -->
+  <footer class="sticky-matrix-footer">
+    <div class="save-status-info">
+      <span class="material-symbols-outlined icon-sm">sync_saved_locally</span>
+      <span>Auto-grade engine active</span>
+    </div>
+
+    <div class="footer-btns-group">
+      <button type="button" class="btn-preview" (click)="togglePreview()">
+        <span class="material-symbols-outlined">preview</span> Preview Summary
+      </button>
+      
+      <button type="button" class="btn-save-draft" (click)="saveDraft()">
+        <span class="material-symbols-outlined">save</span> Save Draft
+      </button>
+
+      <button 
+        type="button" 
+        class="btn-batch-publish" 
+        [disabled]="isSubmitting()"
+        (click)="publishAllGrades()"
+      >
+        Batch Publish All Grades
+        <span class="material-symbols-outlined icon-bolt">bolt</span>
+      </button>
+    </div>
+  </footer>
 </div>
