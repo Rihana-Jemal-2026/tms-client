@@ -7,7 +7,6 @@ export interface StudentGradeRow {
   id: string;
   studentName: string;
   studentId: string;
-  avatar: string;
   section: string;
   attendancePct: number;
   midtermScore: number;
@@ -36,12 +35,20 @@ export class GradeSubmissionComponent implements OnInit {
     "IT-101 Systems Intro",
   ];
 
+  getInitials(name: string): string {
+    if (!name) return "ST";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
+
   rows = signal<StudentGradeRow[]>([
     {
       id: "STU-1001",
       studentName: "Abebe Alemu",
       studentId: "STU-1001",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAdEf1Kf8oCZ5FvCvJCH3vqDYcxjITdA0Ce50QRv6Ral-07KSl4IqMIHK3ut7YhACG-TQUOByz1nPy8wDfinMb_uwJLdlhWKwGdyOCO_V5R5DbOV2lomRUDIQ27DLkumloeT9qFNMXCrr-RVeB2iMkDu-wNyye4Z_GsCeXtRdm7psqHbJl28q_yREOrlIGqP4kf5LgIEUnhFpM7Dbuzi4djn_5h7ez70V-aOqayN0TBo_HKF1UliBTBuw",
       section: "CS-302-A",
       attendancePct: 96,
       midtermScore: 96,
@@ -52,7 +59,6 @@ export class GradeSubmissionComponent implements OnInit {
       id: "STU-1002",
       studentName: "Alemu Tadesse",
       studentId: "STU-1002",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBMozR09GwrXUNv8cpm5U9O8nZvT_CUNMLtIYCIRHWMk1WM-fhBdO6Xnqu48nGk1R6x-7aECVpTlHbcBbcGwF74SMk9uXyizGO_2YQUvPUIfiP8LcToSIOu5HBsco1Wuw4Z5CvLd_zU03KfQgjbHBpEyl6MCBzV6yiw_3sJSxgx_6aQ1Dfbrkz-RscELwmAxHeYzzji1ouMsazyFhfs1uTsIHlRkaztn_JK7fCULus2FWQUSvECMG5WtA",
       section: "CS-302-A",
       attendancePct: 88,
       midtermScore: 86,
@@ -63,12 +69,11 @@ export class GradeSubmissionComponent implements OnInit {
       id: "STU-1003",
       studentName: "Rihana Mohammed",
       studentId: "STU-1003",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBEEyf2un2__DBpS_Fmlc2sgQTpzgvLepFFXAb-OJi_E7rdPGgvGUtuTyf60m5nWIG_-YbHJTugu-dblRcBAH8GByThnsMOFU9U6yx8hlZSNoIDjsfwoh-7n4dnX2FtEbRtHOkU4UuAmflQt9GNh8U93BflLs0GY6A25pFYLHxRwLbGUxoq3Z6Kx-4mbm3hgYiXAP8M1uGSq9DnmPiPaF-Bh6gGkACPwFXRZ3znj6rsb7mSfQf47HysNw",
       section: "CS-302-B",
       attendancePct: 100,
       midtermScore: 99,
       finalGrade: "A+",
-      feedbackNote: "Flawless full-stack integration and highest class score.",
+      feedbackNote: "Exceptional mastery of high-throughput architecture.",
     },
   ]);
 

@@ -76,7 +76,7 @@
             [class.active]="selectedRole === 'Student'"
             (click)="selectRoleTab('Student')"
           >
-            Student
+            <span class="material-symbols-outlined text-xs">school</span> Student
           </button>
           <button 
             type="button" 
@@ -84,7 +84,7 @@
             [class.active]="selectedRole === 'Instructor'"
             (click)="selectRoleTab('Instructor')"
           >
-            Instructor
+            <span class="material-symbols-outlined text-xs">badge</span> Instructor
           </button>
           <button 
             type="button" 
@@ -92,47 +92,8 @@
             [class.active]="selectedRole === 'Admin'"
             (click)="selectRoleTab('Admin')"
           >
-            Admin
+            <span class="material-symbols-outlined text-xs">admin_panel_settings</span> Admin
           </button>
-        </div>
-
-        <!-- Quick Fill Local Demo Accounts -->
-        <div class="demo-quick-login-row">
-          <span class="demo-label">Quick Sign In:</span>
-          <div class="demo-chips">
-            <button
-              type="button"
-              class="chip-btn"
-              (click)="quickLogin('abebe@tms.com', 'StudentPass123!', 'Student')"
-              [class.active]="loginEmail === 'abebe@tms.com'"
-            >
-              <span class="material-symbols-outlined text-xs">school</span> Abebe
-            </button>
-            <button
-              type="button"
-              class="chip-btn"
-              (click)="quickLogin('alemu@tms.com', 'StudentPass123!', 'Student')"
-              [class.active]="loginEmail === 'alemu@tms.com'"
-            >
-              <span class="material-symbols-outlined text-xs">school</span> Alemu
-            </button>
-            <button
-              type="button"
-              class="chip-btn"
-              (click)="quickLogin('rihana@tms.com', 'StudentPass123!', 'Student')"
-              [class.active]="loginEmail === 'rihana@tms.com'"
-            >
-              <span class="material-symbols-outlined text-xs">school</span> Rihana
-            </button>
-            <button
-              type="button"
-              class="chip-btn instructor-chip"
-              (click)="quickLogin('instructor@tms.com', 'InstructorPass123!', 'Instructor')"
-              [class.active]="loginEmail === 'instructor@tms.com'"
-            >
-              <span class="material-symbols-outlined text-xs">badge</span> Instructor
-            </button>
-          </div>
         </div>
 
         <div class="form-header">
@@ -158,7 +119,7 @@
               name="loginEmail"
               type="email"
               [(ngModel)]="loginEmail"
-              placeholder="Email Address"
+              placeholder=" "
               required
             />
             <label for="loginEmail">Email Address</label>
@@ -170,7 +131,7 @@
               name="loginPassword"
               [type]="showPassword ? 'text' : 'password'"
               [(ngModel)]="loginPassword"
-              placeholder="Password"
+              placeholder=" "
               required
             />
             <label for="loginPassword">Password</label>
@@ -227,7 +188,7 @@
                 name="regFirstName"
                 type="text"
                 [(ngModel)]="regFirstName"
-                placeholder="First Name"
+                placeholder=" "
                 required
               />
               <label for="regFirstName">First Name</label>
@@ -239,7 +200,7 @@
                 name="regLastName"
                 type="text"
                 [(ngModel)]="regLastName"
-                placeholder="Last Name"
+                placeholder=" "
                 required
               />
               <label for="regLastName">Last Name</label>
@@ -252,7 +213,7 @@
               name="regEmail"
               type="email"
               [(ngModel)]="regEmail"
-              placeholder="Email Address"
+              placeholder=" "
               required
             />
             <label for="regEmail">Email Address</label>
@@ -264,7 +225,7 @@
               name="regPassword"
               [type]="showPassword ? 'text' : 'password'"
               [(ngModel)]="regPassword"
-              placeholder="Password"
+              placeholder=" "
               required
             />
             <label for="regPassword">Password</label>

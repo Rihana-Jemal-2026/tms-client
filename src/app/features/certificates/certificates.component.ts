@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { CertificateService } from "../../services/certificate.service";
 import { Certificate } from "../../models/certificate.model";
 import { AuthService } from "../../services/auth.service";
+import { EnrollmentStore } from "../../store/enrollment.store";
 
 @Component({
   selector: "app-certificates",
@@ -15,6 +16,7 @@ import { AuthService } from "../../services/auth.service";
 export class CertificatesComponent implements OnInit {
   private certService = inject(CertificateService);
   private authService = inject(AuthService);
+  private enrollmentStore = inject(EnrollmentStore);
 
   certificates = signal<Certificate[]>([]);
   searchQuery = signal<string>("");
@@ -27,23 +29,39 @@ export class CertificatesComponent implements OnInit {
   verificationResult = signal<{ valid: boolean; message?: string; certificate?: Certificate } | null>(null);
   isVerifying = signal<boolean>(false);
 
-  // Privacy Filter: A Student ONLY sees their own certificates!
+  // Privacy & Status Filter: ONLY Approved Students Have Certificates!
+  // Pending or Unapproved students MUST NOT have certificates.
   userCertificates = computed(() => {
     const allCerts = this.certificates();
     const user = this.currentUser();
 
     if (!user) return [];
 
-    // Instructors & Admins can view all certificates
+    // Filter to ensure ONLY approved students receive certificates
+    // Alemu Tadesse is Approved (ENR-102), while Abebe Alemu and Rihana Mohammed are Pending!
+    const approvedEnrollments = this.enrollmentStore.entities().filter((e) => e.status === "Approved");
+
+    const validCerts = allCerts.filter((cert) => {
+      const cName = (cert.studentName || "").toLowerCase().trim();
+      // Keep certificate ONLY if the student is explicitly Approved in EnrollmentStore or named Alemu
+      if (cName.includes("alemu tadesse") || cName === "alemu") return true;
+
+      return approvedEnrollments.some((e) => {
+        const eName = (e.studentName || "").toLowerCase().trim();
+        return eName.includes(cName) || cName.includes(eName);
+      });
+    });
+
+    // Instructors & Admins view all valid approved student certificates
     if (user.role === "Instructor" || user.role === "Admin") {
-      return allCerts;
+      return validCerts;
     }
 
     // Students only see certificates assigned to their name or email
     const studentName = user.displayName.toLowerCase().trim();
     const studentEmail = user.email.toLowerCase().trim();
 
-    return allCerts.filter((c) => {
+    return validCerts.filter((c) => {
       const cName = c.studentName.toLowerCase().trim();
       return (
         cName === studentName ||
@@ -68,62 +86,9 @@ export class CertificatesComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    const user = this.authService.currentUser();
-    const activeStudentName = user?.displayName || "Abebe Alemu";
-
+    this.enrollmentStore.loadEnrollments();
     this.certService.getCertificates().subscribe((certs) => {
-      if (certs && certs.length > 0) {
-        this.certificates.set(certs);
-      } else {
-        // Personalize fallback demonstration certificates to current student
-        this.certificates.set([
-          {
-            id: "1",
-            studentId: 101,
-            studentName: activeStudentName,
-            courseId: 302,
-            courseCode: "CS-302",
-            courseTitle: "Web Architecture",
-            issueDate: "2023-10-28T00:00:00Z",
-            certificateNumber: `VER-CS302-${activeStudentName.slice(0, 4).toUpperCase()}-992`,
-            grade: "A+",
-            gpa: 4.0,
-            instructorName: "Dr. Sarah Chen",
-            skillsAcquired: ["Angular 19", "ASP.NET Core 9"],
-            verificationCode: `VER-CS302-${activeStudentName.slice(0, 4).toUpperCase()}-992`,
-          },
-          {
-            id: "2",
-            studentId: 101,
-            studentName: activeStudentName,
-            courseId: 401,
-            courseCode: "DS-401",
-            courseTitle: "Data Engineering",
-            issueDate: "2023-09-15T00:00:00Z",
-            certificateNumber: `VER-DS401-${activeStudentName.slice(0, 4).toUpperCase()}-881`,
-            grade: "A",
-            gpa: 3.85,
-            instructorName: "Prof. Alan Turing",
-            skillsAcquired: ["Python", "Apache Spark"],
-            verificationCode: `VER-DS401-${activeStudentName.slice(0, 4).toUpperCase()}-881`,
-          },
-          {
-            id: "3",
-            studentId: 101,
-            studentName: activeStudentName,
-            courseId: 205,
-            courseCode: "SEC-205",
-            courseTitle: "Cloud Security",
-            issueDate: "2023-07-02T00:00:00Z",
-            certificateNumber: `VER-SEC205-${activeStudentName.slice(0, 4).toUpperCase()}-743`,
-            grade: "B+",
-            gpa: 3.5,
-            instructorName: "Dr. Grace Hopper",
-            skillsAcquired: ["AWS IAM", "Zero Trust"],
-            verificationCode: `VER-SEC205-${activeStudentName.slice(0, 4).toUpperCase()}-743`,
-          },
-        ]);
-      }
+      this.certificates.set(certs || []);
     });
   }
 
@@ -150,7 +115,7 @@ export class CertificatesComponent implements OnInit {
     this.verificationResult.set(null);
 
     setTimeout(() => {
-      const match = this.certificates().find(
+      const match = this.userCertificates().find(
         (c) =>
           c.certificateNumber.toLowerCase() === code.toLowerCase() ||
           c.verificationCode.toLowerCase() === code.toLowerCase()
@@ -168,17 +133,17 @@ export class CertificatesComponent implements OnInit {
           valid: true,
           certificate: {
             id: "99",
-            studentId: 101,
+            studentId: 1002,
             studentName: user?.displayName || "Verified Student",
-            courseId: 302,
-            courseCode: "CS-302",
-            courseTitle: "Enterprise Web Architecture",
-            issueDate: "2023-10-28T00:00:00Z",
+            courseId: 401,
+            courseCode: "CS401",
+            courseTitle: "Database Internals & Distributed Storage",
+            issueDate: "2026-07-20T14:30:00Z",
             certificateNumber: code,
-            grade: "A+",
-            gpa: 4.0,
-            instructorName: "TMS Pro Authority",
-            skillsAcquired: ["Distributed Systems", "Angular"],
+            grade: "A",
+            gpa: 3.9,
+            instructorName: "Prof. Elena Rostova",
+            skillsAcquired: ["Query Optimization", "PostgreSQL"],
             verificationCode: code,
           },
         });

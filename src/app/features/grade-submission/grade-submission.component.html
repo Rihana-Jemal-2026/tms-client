@@ -99,8 +99,7 @@
               <td>
                 <div class="student-cell">
                   <div class="avatar-box">
-                    <img *ngIf="row.avatar" [src]="row.avatar" [alt]="row.studentName" class="avatar-img" />
-                    <div *ngIf="!row.avatar" class="avatar-fallback">DC</div>
+                    <div class="avatar-fallback">{{ getInitials(row.studentName) }}</div>
                     <span class="online-dot"></span>
                   </div>
                   <div>

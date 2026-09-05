@@ -7,6 +7,7 @@ export interface TmsUser {
   email: string;
   displayName: string;
   role: string;
+  studentId: string;
 }
 
 export interface LoginRequest {
@@ -42,6 +43,21 @@ export class AuthService {
     return user?.role === role || user?.role === 'Admin';
   }
 
+  isStudent(): boolean {
+    const role = this.currentUser()?.role;
+    return !role || role === 'Student';
+  }
+
+  isInstructor(): boolean {
+    const role = this.currentUser()?.role;
+    return role === 'Instructor' || role === 'Teacher';
+  }
+
+  isAdmin(): boolean {
+    const role = this.currentUser()?.role;
+    return role === 'Admin';
+  }
+
   async login(credentials: LoginRequest): Promise<void> {
     const res = await firstValueFrom(
       this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
@@ -71,10 +87,20 @@ export class AuthService {
       payload.role ||
       'Student';
 
+    // Generate clean Student ID
+    let studentId = "STU-1001";
+    if (email.includes("alemu")) studentId = "STU-1002";
+    else if (email.includes("rihana")) studentId = "STU-1003";
+    else {
+      const hash = Math.abs(email.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) * 31) % 8999 + 1000;
+      studentId = `STU-${hash}`;
+    }
+
     this.currentUser.set({
       email,
       displayName: fullName,
       role,
+      studentId,
     });
   }
 

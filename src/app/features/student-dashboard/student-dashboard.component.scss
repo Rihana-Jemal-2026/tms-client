@@ -1075,10 +1075,16 @@
     align-items: center;
     justify-content: center;
 
-    &.active, &:hover {
+    &.active, &:hover:not(:disabled) {
       background: #4f46e5;
       border-color: #4f46e5;
       box-shadow: 0 0 10px rgba(79, 70, 229, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      pointer-events: none;
     }
   }
 

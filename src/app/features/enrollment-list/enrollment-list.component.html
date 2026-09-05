@@ -101,7 +101,7 @@
             </td>
             <td>
               <div class="student-meta">
-                <img [src]="item.avatar" [alt]="item.studentName" class="avatar-img" />
+                <div class="avatar-initials-badge">{{ getInitials(item.studentName) }}</div>
                 <div>
                   <strong class="student-name">{{ item.studentName }}</strong>
                   <span class="student-id">ID: {{ item.studentId }}</span>

@@ -60,40 +60,51 @@
           <h2>Select Course Segment</h2>
         </div>
 
-        <div class="search-combobox-wrapper">
-          <label class="input-label">Search Catalog</label>
-          <div class="search-input-box">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input
-              type="text"
-              [value]="searchQuery()"
-              (input)="filterCourses($any($event.target).value)"
-              placeholder="Type course code or name..."
-            />
-            <span class="shortcut-tag">CMD+K</span>
+        <div class="course-selection-container">
+          <div class="form-group dropdown-group">
+            <label for="courseSelect" class="input-label">Select Course</label>
+            <div class="select-wrapper">
+              <select
+                id="courseSelect"
+                formControlName="courseCode"
+                (change)="onCourseDropdownChange($any($event.target).value)"
+                class="course-select-dropdown"
+              >
+                <option value="" disabled>-- Select a Course from Catalog --</option>
+                <option *ngFor="let c of catalogCourses()" [value]="c.code">
+                  {{ c.code }}: {{ c.title }}{{ isCourseRegistered(c.code) ? ' — [Already Registered]' : '' }}
+                </option>
+              </select>
+            </div>
           </div>
 
-          <!-- Combobox Dropdown Results -->
-          <div class="results-dropdown">
-            <button
-              type="button"
-              *ngFor="let c of filteredCourses()"
-              class="result-item-btn"
-              (click)="selectCourse(c)"
-            >
-              <div class="item-info">
-                <strong class="course-code-title">{{ c.code }}: {{ c.name }}</strong>
-                <span class="instructor-sub">{{ c.instructor }} • {{ c.tier }}</span>
-              </div>
+          <!-- Duplicate Notification Alert Banner -->
+          <div *ngIf="isAlreadyEnrolled()" class="duplicate-alert-banner">
+            <div class="alert-icon-box">
+              <span class="material-symbols-outlined icon-amber">error</span>
+            </div>
+            <div class="alert-content">
+              <h4>You are already registered for this course!</h4>
+              <p>You have an active or pending enrollment application for <strong>{{ selectedCourse()?.title }}</strong>. Duplicate applications are not allowed.</p>
+            </div>
+          </div>
 
-              <span 
-                class="seat-tag" 
-                [class.urgent]="c.isUrgent"
-                [class.waitlist]="c.isWaitlist"
-              >
-                {{ c.seatsText }}
-              </span>
-            </button>
+          <!-- Selected Course Preview Card -->
+          <div *ngIf="selectedCourse() as c" class="course-preview-card">
+            <div class="preview-header">
+              <span class="preview-badge">{{ c.code }}</span>
+              <h3 class="preview-title">{{ c.title }}</h3>
+            </div>
+            <div class="preview-meta">
+              <div class="meta-item">
+                <span class="material-symbols-outlined">group</span>
+                <span>Capacity: <strong>{{ c.enrollmentCount || 0 }}/{{ c.maxCapacity || 30 }} Enrolled</strong></span>
+              </div>
+              <div class="meta-item" *ngIf="c.status">
+                <span class="material-symbols-outlined">info</span>
+                <span>Status: <strong>{{ c.status }}</strong></span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -12,9 +12,9 @@
       <span class="lbl-gold">Official Credentials</span>
     </div>
 
-    <h1 class="hero-title">Student Digital Certificates Hub</h1>
+    <h1 class="hero-title">{{ currentUser()?.role === 'Instructor' || currentUser()?.role === 'Teacher' || currentUser()?.role === 'Admin' ? 'Student Certificates Registry' : 'My Digital Certificates Hub' }}</h1>
     <p class="hero-subtitle">
-      Access, verify, and share your earned academic credentials. All certificates are cryptographically signed and blockchain-verified.
+      {{ currentUser()?.role === 'Instructor' || currentUser()?.role === 'Teacher' || currentUser()?.role === 'Admin' ? 'Inspect, search, and verify official academic certificates issued to students upon course completion.' : 'Access, verify, and share your earned academic credentials. All certificates are cryptographically signed and blockchain-verified.' }}
     </p>
   </section>
 
@@ -71,8 +71,8 @@
       <!-- Stats / Summary Card -->
       <div class="stats-card glass-panel-box">
         <div>
-          <span class="lbl-uppercase">Total Earned</span>
-          <strong class="display-val">{{ certificates().length }}</strong>
+          <span class="lbl-uppercase">{{ currentUser()?.role === 'Instructor' || currentUser()?.role === 'Teacher' || currentUser()?.role === 'Admin' ? 'Total Issued' : 'Total Earned' }}</span>
+          <strong class="display-val">{{ userCertificates().length }}</strong>
         </div>
 
         <div class="radial-ring-box">

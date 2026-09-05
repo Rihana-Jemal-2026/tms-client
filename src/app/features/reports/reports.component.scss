@@ -536,11 +536,18 @@
 
         &:hover { border-color: rgba(99, 102, 241, 0.4); }
 
-        .chip-avatar {
+        .chip-avatar-initials {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          object-fit: cover;
+          background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+          color: #ffffff;
+          font-weight: 800;
+          font-size: 0.75rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
         }
 
         .chip-info {

@@ -3,20 +3,31 @@
 @if (!isAuthPage()) {
   <header class="app-navbar">
     <div class="nav-container">
-      <a routerLink="/dashboard" class="nav-brand">
+      <a [routerLink]="authService.isInstructor() || authService.isAdmin() ? '/instructor' : '/dashboard'" class="nav-brand">
         <span class="material-symbols-outlined brand-icon">school</span>
         <span class="brand-title">TMS <span class="brand-pill">Pro</span></span>
       </a>
 
-      @if (authService.currentUser()) {
+      @if (authService.currentUser(); as user) {
         <nav class="nav-links">
-          <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-          <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
-          <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
-          <a routerLink="/certificates" routerLinkActive="active">Certificates</a>
+          <!-- STUDENT ONLY LINKS -->
+          @if (authService.isStudent()) {
+            <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+            <a routerLink="/enroll" routerLinkActive="active">Enrollment Form</a>
+            <a routerLink="/certificates" routerLinkActive="active">Certificates</a>
+          }
 
-          @if (authService.hasRole('Instructor')) {
+          <!-- INSTRUCTOR / TEACHER ONLY LINKS (Queue, Reports & Enrollment Form REMOVED) -->
+          @if (authService.isInstructor()) {
             <a routerLink="/instructor" routerLinkActive="active">Instructor Portal</a>
+            <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
+            <a routerLink="/certificates" routerLinkActive="active">Certificates</a>
+          }
+
+          <!-- ADMIN ONLY LINKS (Includes Approval Queue & System Reports) -->
+          @if (authService.isAdmin()) {
+            <a routerLink="/instructor" routerLinkActive="active">Admin Portal</a>
+            <a routerLink="/enrollments" routerLinkActive="active">Queue</a>
             <a routerLink="/grade-submission" routerLinkActive="active">Grade Submissions</a>
             <a routerLink="/reports" routerLinkActive="active">Reports</a>
           }

@@ -202,7 +202,7 @@
       <!-- Student Chips Row -->
       <div class="chips-flex-row">
         <div *ngFor="let student of unenrolledStudentChips()" class="student-chip-card">
-          <img [src]="student.avatar" [alt]="student.name" class="chip-avatar" />
+          <div class="chip-avatar-initials">{{ getInitials(student.name) }}</div>
           <div class="chip-info">
             <strong class="chip-name">{{ student.name }}</strong>
             <span class="chip-status">{{ student.statusText }}</span>

@@ -201,21 +201,31 @@
     background: rgba(15, 23, 42, 0.4);
     border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
     margin-bottom: 1.5rem;
+    border-radius: 12px;
 
     .role-btn {
       flex: 1;
       background: none;
       border: none;
       color: var(--text-muted, #94a3b8);
-      padding: 0.65rem;
+      padding: 0.75rem 0.5rem;
       font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
       position: relative;
-      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+
+      .material-symbols-outlined {
+        font-size: 1.05rem;
+      }
 
       &.active {
         color: #818cf8;
+        background: rgba(99, 102, 241, 0.12);
 
         &::after {
           content: '';
@@ -226,6 +236,10 @@
           height: 2px;
           background: #6366f1;
         }
+      }
+
+      &:hover:not(.active) {
+        color: #e2e8f0;
       }
     }
   }
@@ -285,6 +299,18 @@
           &:hover, &.active {
             background: #0284c7;
             border-color: #38bdf8;
+            color: #fff;
+          }
+        }
+
+        &.admin-chip {
+          background: rgba(168, 85, 247, 0.12);
+          border-color: rgba(168, 85, 247, 0.3);
+          color: #c084fc;
+
+          &:hover, &.active {
+            background: #9333ea;
+            border-color: #c084fc;
             color: #fff;
           }
         }
@@ -376,17 +402,19 @@
 
     input {
       width: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+      background: rgba(15, 23, 42, 0.7);
+      border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.12));
       border-radius: 14px;
-      padding: 1.2rem 1rem 0.5rem;
+      padding: 1.4rem 1rem 0.45rem;
       color: var(--text-main, #ffffff);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 500;
       outline: none;
-      transition: border-color 0.2s ease;
+      transition: all 0.2s ease;
 
       &:focus {
         border-color: #22d3ee;
+        box-shadow: 0 0 12px rgba(34, 211, 238, 0.25);
       }
 
       &::placeholder {
@@ -394,17 +422,28 @@
       }
 
       &:focus ~ label,
-      &:not(:placeholder-shown) ~ label {
-        top: 0.35rem;
+      &:not(:placeholder-shown) ~ label,
+      &:-webkit-autofill ~ label,
+      &:autofill ~ label {
+        top: 0.3rem;
         font-size: 0.68rem;
+        font-weight: 700;
         color: #22d3ee;
+      }
+
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--text-main, #ffffff) !important;
+        -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+        transition: background-color 5000s ease-in-out 0s;
       }
     }
 
     label {
       position: absolute;
       left: 1rem;
-      top: 0.85rem;
+      top: 0.9rem;
       font-size: 0.85rem;
       color: var(--text-muted, #94a3b8);
       pointer-events: none;

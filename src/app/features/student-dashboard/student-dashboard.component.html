@@ -14,16 +14,13 @@
 
     <div class="metrics-pills">
       <div class="pill-metric">
-        <span class="label">Credits Earned</span>
-        <span class="val purple">{{ earnedCredits() }} CR</span>
+        <span class="label">Term Credits</span>
+        <span class="val purple">{{ earnedCredits() }} CR / 18 CR Max</span>
       </div>
       <div class="pill-metric">
         <span class="label">Status</span>
         <span class="val green">{{ graduationStatus() }}</span>
       </div>
-      <button class="btn-quick-reg" (click)="registerForClass()">
-        <span class="material-symbols-outlined text-xs">add_circle</span> +3 Credits
-      </button>
     </div>
   </div>
 
@@ -170,19 +167,19 @@
         </div>
 
         <div class="timeline-list">
-          <div class="timeline-item">
-            <div class="dot cyan"></div>
-            <span class="item-time text-cyan">Today, 14:00 - 15:30</span>
-            <p class="item-title">Live Q&A: Cloud Arch</p>
-            <span class="item-sub">Webex Room B</span>
-          </div>
-
-          <div class="timeline-item">
-            <div class="dot red"></div>
-            <span class="item-time text-red">Tomorrow, 09:00 - 12:00</span>
-            <p class="item-title">Workshop: Rust Basics</p>
-            <span class="item-sub">Virtual Lab 4</span>
-          </div>
+          @if (userEnrollments().length === 0) {
+            <div class="timeline-empty-state">
+              <span class="material-symbols-outlined icon-muted">event_busy</span>
+              <p class="empty-msg">No scheduled classes. Enroll in a course below to see your class schedule here.</p>
+            </div>
+          } @else {
+            <div *ngFor="let enr of userEnrollments()" class="timeline-item">
+              <div class="dot cyan"></div>
+              <span class="item-time text-cyan">Mon & Wed • 10:00 - 11:30</span>
+              <p class="item-title">{{ enr.courseName }}</p>
+              <span class="item-sub">Virtual Lecture Hall & Lab</span>
+            </div>
+          }
         </div>
       </div>
 
@@ -233,7 +230,7 @@
           <input 
             type="text" 
             [ngModel]="searchQuery()" 
-            (ngModelChange)="searchQuery.set($event)" 
+            (ngModelChange)="searchQuery.set($event); currentPage.set(1)" 
             placeholder="Search courses..." 
           />
         </div>
@@ -242,24 +239,34 @@
         <div class="filter-group">
           <h4 class="group-title">Categories</h4>
           <label class="check-label">
-            <input type="checkbox" checked />
+            <input type="checkbox" [checked]="isCategorySelected('Data Engineering')" (change)="toggleCategory('Data Engineering')" />
             <span class="check-custom"></span>
             <span>Data Engineering</span>
           </label>
           <label class="check-label">
-            <input type="checkbox" />
+            <input type="checkbox" [checked]="isCategorySelected('Cloud Architecture')" (change)="toggleCategory('Cloud Architecture')" />
             <span class="check-custom"></span>
             <span>Cloud Architecture</span>
           </label>
           <label class="check-label">
-            <input type="checkbox" />
+            <input type="checkbox" [checked]="isCategorySelected('Cybersecurity')" (change)="toggleCategory('Cybersecurity')" />
             <span class="check-custom"></span>
             <span>Cybersecurity</span>
           </label>
           <label class="check-label">
-            <input type="checkbox" />
+            <input type="checkbox" [checked]="isCategorySelected('Machine Learning')" (change)="toggleCategory('Machine Learning')" />
             <span class="check-custom"></span>
             <span>Machine Learning</span>
+          </label>
+          <label class="check-label">
+            <input type="checkbox" [checked]="isCategorySelected('Software Engineering')" (change)="toggleCategory('Software Engineering')" />
+            <span class="check-custom"></span>
+            <span>Software Engineering</span>
+          </label>
+          <label class="check-label">
+            <input type="checkbox" [checked]="isCategorySelected('Computer Science')" (change)="toggleCategory('Computer Science')" />
+            <span class="check-custom"></span>
+            <span>Computer Science</span>
           </label>
         </div>
 
@@ -267,23 +274,30 @@
         <div class="filter-group">
           <h4 class="group-title">Difficulty Level</h4>
           <div class="pills-group">
-            <button class="pill-btn active">Beginner</button>
-            <button class="pill-btn">Intermediate</button>
-            <button class="pill-btn">Advanced</button>
+            <button type="button" class="pill-btn" [class.active]="selectedDifficulty() === 'Beginner'" (click)="selectDifficulty('Beginner')">Beginner</button>
+            <button type="button" class="pill-btn" [class.active]="selectedDifficulty() === 'Intermediate'" (click)="selectDifficulty('Intermediate')">Intermediate</button>
+            <button type="button" class="pill-btn" [class.active]="selectedDifficulty() === 'Advanced'" (click)="selectDifficulty('Advanced')">Advanced</button>
           </div>
         </div>
 
         <!-- Duration -->
         <div class="filter-group">
-          <h4 class="group-title">Max Duration</h4>
-          <input type="range" min="1" max="40" value="20" class="range-slider" />
+          <h4 class="group-title">Max Duration: {{ maxDuration() }}h</h4>
+          <input 
+            type="range" 
+            min="4" 
+            max="40" 
+            [ngModel]="maxDuration()" 
+            (ngModelChange)="updateMaxDuration($event)" 
+            class="range-slider" 
+          />
           <div class="range-labels">
-            <span>1h</span>
+            <span>4h</span>
             <span>40h+</span>
           </div>
         </div>
 
-        <button class="btn-reset-filters" (click)="resetFilters()">Reset Filters</button>
+        <button type="button" class="btn-reset-filters" (click)="resetFilters()">Reset Filters</button>
       </div>
     </aside>
 
@@ -292,7 +306,9 @@
       <div class="catalog-top-bar">
         <div>
           <h2>Available Course Catalog</h2>
-          <span class="results-count">Showing {{ filteredCourses().length }} Available Courses</span>
+          <span class="results-count">
+            Showing {{ paginatedCourses().length }} of {{ filteredCourses().length }} Courses (Page {{ currentPage() }} of {{ totalPages() }})
+          </span>
         </div>
 
         <div class="search-input-wrapper">
@@ -300,7 +316,7 @@
           <input 
             type="text" 
             [ngModel]="searchQuery()" 
-            (ngModelChange)="searchQuery.set($event)" 
+            (ngModelChange)="searchQuery.set($event); currentPage.set(1)" 
             placeholder="Search course title or code..." 
           />
         </div>
@@ -331,16 +347,16 @@
 
       <!-- Course Grid -->
       <div *ngIf="!coursesResource.isLoading()" class="course-grid">
-        <article *ngFor="let course of filteredCourses()" class="course-card-glass">
+        <article *ngFor="let course of paginatedCourses()" class="course-card-glass">
           <div class="card-thumb">
-            <div class="thumb-badge">NEW</div>
+            <div class="thumb-badge">{{ getCourseDifficulty(course) }}</div>
             <div class="time-tag">
-              <span class="material-symbols-outlined icon-xs">schedule</span> 12h
+              <span class="material-symbols-outlined icon-xs">schedule</span> {{ getCourseDuration(course) }}h
             </div>
           </div>
 
           <div class="card-content">
-            <div class="category-tag">{{ course.code.slice(0, 2) === 'CS' ? 'Computer Science' : 'Software Engineering' }}</div>
+            <div class="category-tag">{{ getCourseCategory(course) }}</div>
             <h3 class="course-title">{{ course.title }}</h3>
             <p class="course-code-sub">Course Code: <strong>{{ course.code }}</strong></p>
 
@@ -368,10 +384,10 @@
               <button 
                 class="btn-enroll-action" 
                 (click)="handleEnroll(course)"
-                [disabled]="course.enrollmentCount >= course.maxCapacity || isEnrolledInCourse(course)"
+                [disabled]="course.enrollmentCount >= course.maxCapacity || isEnrolledInCourse(course) || isMaxCreditsReached()"
                 [class.enrolled-active]="isEnrolledInCourse(course)"
               >
-                {{ isEnrolledInCourse(course) ? 'Enrolled' : (course.enrollmentCount >= course.maxCapacity ? 'Capacity Full' : 'Enroll Now →') }}
+                {{ isEnrolledInCourse(course) ? 'Enrolled' : (isMaxCreditsReached() ? '18 CR Limit' : (course.enrollmentCount >= course.maxCapacity ? 'Capacity Full' : 'Enroll Now →')) }}
               </button>
             </div>
           </div>
@@ -385,13 +401,34 @@
       </div>
 
       <!-- Pagination Footer -->
-      <div class="pagination-bar">
-        <button class="page-btn"><span class="material-symbols-outlined">chevron_left</span></button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <span class="dots">...</span>
-        <button class="page-btn"><span class="material-symbols-outlined">chevron_right</span></button>
+      <div *ngIf="totalPages() > 1" class="pagination-bar">
+        <button 
+          type="button"
+          class="page-btn" 
+          [disabled]="currentPage() === 1"
+          (click)="setPage(currentPage() - 1)"
+        >
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+
+        <button 
+          *ngFor="let page of pageNumbers()" 
+          type="button"
+          class="page-btn" 
+          [class.active]="currentPage() === page"
+          (click)="setPage(page)"
+        >
+          {{ page }}
+        </button>
+
+        <button 
+          type="button"
+          class="page-btn" 
+          [disabled]="currentPage() === totalPages()"
+          (click)="setPage(currentPage() + 1)"
+        >
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
       </div>
     </main>
   </div>

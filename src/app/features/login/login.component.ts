@@ -165,17 +165,18 @@ export class LoginComponent {
       const registeredPassword = this.regPassword;
       const firstName = this.regFirstName.trim();
 
-      // 2. Pre-fill Sign In credentials & role tab
+      // 2. Pre-fill Sign In form with registered credentials & role
       this.loginEmail = registeredEmail;
       this.loginPassword = registeredPassword;
       this.selectedRole = registeredRole;
 
-      // 3. Display explicit success banner
-      this.successMessage = `Registration successful, ${firstName}! Your ${registeredRole} account has been inserted into the system. Click 'Sign In' below to access your portal.`;
+      // 3. Set success banner message
+      this.successMessage = `Account created successfully, ${firstName}! Click 'Sign In' below to access your ${registeredRole} portal.`;
 
-      // 4. Switch to Sign In mode & clear registration form fields
+      // 4. Switch back to Sign In mode (go back so student can sign in manually)
       this.isLoginMode = true;
 
+      // 5. Clear registration form fields
       this.regFirstName = "";
       this.regLastName = "";
       this.regEmail = "";

@@ -2,12 +2,12 @@ import { Component, inject, signal, computed, OnInit, Input } from "@angular/cor
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { EnrollmentStore } from "../../store/enrollment.store";
+import { AuthService } from "../../services/auth.service";
 
 export interface DisplayEnrollment {
   id: string;
   studentName: string;
   studentId: string;
-  avatar: string;
   courseCode: string;
   courseName: string;
   submissionDate: string;
@@ -26,6 +26,7 @@ export class EnrollmentListComponent implements OnInit {
   @Input() embedded: boolean = false;
 
   store = inject(EnrollmentStore);
+  auth = inject(AuthService);
 
   activeTab = signal<"all" | "pending" | "approved" | "rejected">("pending");
   searchQuery = signal<string>("");
@@ -36,7 +37,6 @@ export class EnrollmentListComponent implements OnInit {
       id: "ENV-101",
       studentName: "Abebe Alemu",
       studentId: "STU-1001",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAdEf1Kf8oCZ5FvCvJCH3vqDYcxjITdA0Ce50QRv6Ral-07KSl4IqMIHK3ut7YhACG-TQUOByz1nPy8wDfinMb_uwJLdlhWKwGdyOCO_V5R5DbOV2lomRUDIQ27DLkumloeT9qFNMXCrr-RVeB2iMkDu-wNyye4Z_GsCeXtRdm7psqHbJl28q_yREOrlIGqP4kf5LgIEUnhFpM7Dbuzi4djn_5h7ez70V-aOqayN0TBo_HKF1UliBTBuw",
       courseCode: "CS-501",
       courseName: "Enterprise Distributed Systems",
       submissionDate: "Oct 24, 2026",
@@ -47,7 +47,6 @@ export class EnrollmentListComponent implements OnInit {
       id: "ENV-102",
       studentName: "Alemu Tadesse",
       studentId: "STU-1002",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBMozR09GwrXUNv8cpm5U9O8nZvT_CUNMLtIYCIRHWMk1WM-fhBdO6Xnqu48nGk1R6x-7aECVpTlHbcBbcGwF74SMk9uXyizGO_2YQUvPUIfiP8LcToSIOu5HBsco1Wuw4Z5CvLd_zU03KfQgjbHBpEyl6MCBzV6yiw_3sJSxgx_6aQ1Dfbrkz-RscELwmAxHeYzzji1ouMsazyFhfs1uTsIHlRkaztn_JK7fCULus2FWQUSvECMG5WtA",
       courseCode: "SEC-402",
       courseName: "Advanced Threat Modeling",
       submissionDate: "Oct 24, 2026",
@@ -58,7 +57,6 @@ export class EnrollmentListComponent implements OnInit {
       id: "ENV-103",
       studentName: "Rihana Mohammed",
       studentId: "STU-1003",
-      avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBEEyf2un2__DBpS_Fmlc2sgQTpzgvLepFFXAb-OJi_E7rdPGgvGUtuTyf60m5nWIG_-YbHJTugu-dblRcBAH8GByThnsMOFU9U6yx8hlZSNoIDjsfwoh-7n4dnX2FtEbRtHOkU4UuAmflQt9GNh8U93BflLs0GY6A25pFYLHxRwLbGUxoq3Z6Kx-4mbm3hgYiXAP8M1uGSq9DnmPiPaF-Bh6gGkACPwFXRZ3znj6rsb7mSfQf47HysNw",
       courseCode: "AI-600",
       courseName: "Neural Network Architectures",
       submissionDate: "Oct 23, 2026",
@@ -68,6 +66,15 @@ export class EnrollmentListComponent implements OnInit {
   ];
 
   enrollmentsList = signal<DisplayEnrollment[]>(this.mockEnrollments);
+
+  getInitials(name: string): string {
+    if (!name) return "ST";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
 
   allEnrollmentsMerged = computed(() => {
     const storeEntities = this.store.entities();
@@ -81,7 +88,6 @@ export class EnrollmentListComponent implements OnInit {
           id: String(ent.id),
           studentName: ent.studentName || "Abebe Alemu",
           studentId: `STU-${ent.studentId || 1001}`,
-          avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAdEf1Kf8oCZ5FvCvJCH3vqDYcxjITdA0Ce50QRv6Ral-07KSl4IqMIHK3ut7YhACG-TQUOByz1nPy8wDfinMb_uwJLdlhWKwGdyOCO_V5R5DbOV2lomRUDIQ27DLkumloeT9qFNMXCrr-RVeB2iMkDu-wNyye4Z_GsCeXtRdm7psqHbJl28q_yREOrlIGqP4kf5LgIEUnhFpM7Dbuzi4djn_5h7ez70V-aOqayN0TBo_HKF1UliBTBuw",
           courseCode: ent.courseName ? ent.courseName.slice(0, 6) : "CS-101",
           courseName: ent.courseName || "General Course",
           submissionDate: ent.submittedAt ? new Date(ent.submittedAt).toLocaleDateString() : "Today",
@@ -89,6 +95,18 @@ export class EnrollmentListComponent implements OnInit {
           isSelected: false,
         });
       }
+    }
+
+    if (!this.auth.hasRole('Instructor')) {
+      const user = this.auth.currentUser();
+      const userName = (user?.displayName || "").toLowerCase();
+      const userEmail = (user?.email || "").toLowerCase();
+
+      return currentList.filter((e) => {
+        const name = e.studentName.toLowerCase();
+        const idStr = e.studentId.toLowerCase();
+        return name.includes(userName) || (userEmail && (name.includes(userEmail) || idStr.includes(userEmail)));
+      });
     }
 
     return currentList;

@@ -55,6 +55,7 @@ export const routes: Routes = [
   },
   {
     path: "enrollments",
+    canActivate: [roleGuard("Admin")],
     loadComponent: () =>
       import("./features/enrollment-list/enrollment-list.component").then(
         (m) => m.EnrollmentListComponent,
@@ -77,7 +78,7 @@ export const routes: Routes = [
   },
   {
     path: "reports",
-    canActivate: [roleGuard("Instructor")],
+    canActivate: [roleGuard("Admin")],
     loadComponent: () =>
       import("./features/reports/reports.component").then(
         (m) => m.ReportsComponent
